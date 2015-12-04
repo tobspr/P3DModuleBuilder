@@ -25,7 +25,7 @@ def run_cmake(module_name):
     if PandaSystem.get_major_version() > 1 or PandaSystem.get_minor_version() > 9:
         cmake_args += ['-DINTERROGATE_LIB:STRING=interrogatedb']
     else:
-        cmake_args += ['-DINTERROGATE_LIB:STRING=p3core']
+        cmake_args += ['-DINTERROGATE_LIB:STRING=panda']
 
 
     if is_windows():

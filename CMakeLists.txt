@@ -169,13 +169,12 @@ ENDFOREACH()
 # Add the required libraries
 target_link_libraries(${PROJECT_NAME} ${PYTHON_LIBRARIES} ${PANDA_LIBRARIES} ${BULLET_LIBRARIES})
 
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/Output)
 
 # After building, copy the file to the current directory
-# add_custom_command(
-#     TARGET ${PROJECT_NAME}
-#     POST_BUILD
-#     COMMAND "${PYTHON_EXECUTABLE}" "-B" "${CMAKE_CURRENT_LIST_DIR}/Scripts/finalize.py" "$<TARGET_FILE:${PROJECT_NAME}>"
-#     WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR})
+add_custom_command(
+    TARGET ${PROJECT_NAME}
+    POST_BUILD
+    COMMAND "${PYTHON_EXECUTABLE}" "-B" "${CMAKE_CURRENT_LIST_DIR}/Scripts/finalize.py" "${PROJECT_NAME}"
+    WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR})
 
 

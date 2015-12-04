@@ -3,19 +3,12 @@ from __future__ import print_function
 # This script just copies the generated .pyd file to the current directory.
 
 import sys
-sys.dont_write_bytecode = True
-
 import platform
 from shutil import copyfile
 from os.path import isfile, join, dirname, realpath, isdir
-
 from panda3d.core import PandaSystem
-
 from common import *
 
-# Storage for the precompiled render pipeline binaries
-# BINARY_STORAGE = "E:\Dropbox\Sonstiges\PrecompiledBuilds"
-MODULE_NAME = "RSNative"
 
 def find_binary():
     """ Returns the path to the generated binary and pdb file """
@@ -26,10 +19,8 @@ def find_binary():
     # Stores where we find the generated PDB
     pdb_file = None
 
-    curr_dir = get_script_dir()
     possible_files = []
     possible_pdb_files = []
-    target_pdb_file = MODULE_NAME + ".pdb"
 
     if is_windows():
 
@@ -52,16 +43,21 @@ def find_binary():
             if isfile(pdb_name):
                 pdb_file = pdb_name
 
-    return source_file, pdb_file
+    return source_file, pdb_file, target_file
 
 
 if __name__ == "__main__":
 
-    source_file, pdb_file = 
+
+    if len(sys.argv) != 2:
+        fatal_error("Usage: finalize.py <module-name>")
+
+    MODULE_NAME = sys.argv[1]
+    source_file, pdb_file, target_file = find_binary()
+    target_pdb_file = MODULE_NAME + ".pdb"
 
     if source_file:
-
-        dest_folder = join(curr_dir, "../../Code/Native")
+        dest_folder = join(get_script_dir(), "../")
 
         # Copy the generated DLL
         copyfile(source_file, join(dest_folder, target_file))
@@ -70,14 +66,7 @@ if __name__ == "__main__":
         if pdb_file:
             copyfile(pdb_file, join(dest_folder, target_pdb_file))
 
-
-        if isdir(BINARY_STORAGE):
-
-            # Copy DLL to the precompiled binary dir
-            target_filename = "RSNative_" + PandaSystem.getPlatform() + ".pyd"
-            target_filename = join(BINARY_STORAGE, target_filename)
-
-            copyfile(source_file, target_filename)
-
     else:
-        print("Failed to find source file at", ' or '.join(possible_files), "!", file=sys.stderr)
+        fatal_error("Failed to find generated binary!")
+
+    sys.exit(0)
