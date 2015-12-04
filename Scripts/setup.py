@@ -23,7 +23,7 @@ def run_cmake(module_name):
 
     # Check for the right interrogate lib
     if PandaSystem.get_major_version() > 1 or PandaSystem.get_minor_version() > 9:
-        cmake_args += ['-DINTERROGATE_LIB:STRING=interrogatedb']
+        cmake_args += ['-DINTERROGATE_LIB:STRING=p3interrogatedb']
     else:
         cmake_args += ['-DINTERROGATE_LIB:STRING=panda']
 
