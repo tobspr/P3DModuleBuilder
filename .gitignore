@@ -5,3 +5,5 @@
 win_amd64/
 win_i386/
 Source/Interrogate*
+module_name.cfg
+
