@@ -1,0 +1,6 @@
+*.pyd
+*.pyc
+*.so
+win_amd64/
+win_i386/
+Source/Interrogate*
