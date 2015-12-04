@@ -10,6 +10,17 @@ and distributing your modules the matter of a single command / mouseclick.
 - CMake 2.6 or higher (get it <a href="https://cmake.org/download/">here</a>)
 
 
+**For compiling on Windows 32 bit:**
+
+- Visual Studio 2010 (any version)
+
+**For compiling on Windows 64 bit:**
+
+- Visual Studio 2010 (any version)
+- Windows SDK 7.1 (be sure to tick the VC++ 64 bit compilers)
+
+
+
 ## Usage
 
 
