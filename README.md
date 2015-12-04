@@ -6,7 +6,7 @@ and distributing your modules the matter of a single command / mouseclick.
 
 ## Requirements
 
-- The Panda3D SDK (get it <a href="http://github.com/panda3d/panda3d">here</a>)
+- The Panda3D SDK (get it <a href="http://www.panda3d.org/download.php?sdk">here</a>)
 - CMake 2.6 or higher (get it <a href="https://cmake.org/download/">here</a>)
 
 

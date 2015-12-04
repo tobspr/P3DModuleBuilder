@@ -44,14 +44,3 @@ def run_cmake_build():
     """ Runs the cmake build which builds the final output """
     try_execute("cmake", "--build", ".", "--config", "RelWithDebInfo")
 
-
-# if __name__ == "__main__":
-
-    # make_output_dir()
-    # run_cmake()
-
-    # if not "--cmake-only" in sys.argv:
-        # run_cmake_build()
-
-    # print("Success!")
-    # sys.exit(0)
