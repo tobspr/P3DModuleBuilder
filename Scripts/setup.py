@@ -31,7 +31,7 @@ def run_cmake(module_name):
     if is_windows():
         # Specify 64-bit compiler when using a 64 bit panda sdk build
         bit_suffix = " Win64" if is_64_bit() else ""
-        # cmake_args += ['-GVisual Studio 10 2010' + bit_suffix]
+        cmake_args += ['-GVisual Studio 10 2010' + bit_suffix]
 
     # if sys.version_info.major == 3:
     pyver = "{}{}".format(sys.version_info.major, sys.version_info.minor)
