@@ -4,6 +4,6 @@
 // Pandas convention is to name the file ClassName.I for those functions and
 // include it in the header file.
 
-int ExampleClass::multiply(int a, int b) {
+int ExampleClass::multiply(int a, int b) const {
     return a * b;
 }

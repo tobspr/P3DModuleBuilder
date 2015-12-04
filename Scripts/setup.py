@@ -33,9 +33,10 @@ def run_cmake(module_name):
         bit_suffix = " Win64" if is_64_bit() else ""
         cmake_args += ['-GVisual Studio 10 2010' + bit_suffix]
 
-    # if sys.version_info.major == 3:
-    pyver = "{}{}".format(sys.version_info.major, sys.version_info.minor)
-    cmake_args += ['-DPYTHONVER:STRING=' + pyver]
+    if is_windows():
+        # Specify python version, but only on windows
+        pyver = "{}{}".format(sys.version_info.major, sys.version_info.minor)
+        cmake_args += ['-DPYTHONVER:STRING=' + pyver]
 
     try_execute("cmake", join_abs(get_script_dir(), ".."), *cmake_args)
 

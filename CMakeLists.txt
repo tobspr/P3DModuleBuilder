@@ -6,10 +6,11 @@ project (${PROJECT_NAME})
 set(CMAKE_BUILD_TYPE "Release")
 set(PYTHON_EXECUTABLE CACHE STRING "python")
 set(INTERROGATE_LIB CACHE STRING "p3interrogatedb")
-set(PYTHONVER CACHE STRING "27")
 
 
 if (WIN32)
+  
+  set(PYTHONVER CACHE STRING "27")
   
   # Find panda path
   EXECUTE_PROCESS(
@@ -106,8 +107,14 @@ include_directories("Source/")
 set(SOURCES ${SOURCES_H} ${SOURCES})
 
 # Collect subdirs for compiling
-file(GLOB SOURCE_DIRS Source/*)
-include_directories(${SOURCE_DIRS})
+file(GLOB_RECURSE POSSIBLE_DIRS Source/*)
+FOREACH(PDIR ${POSSIBLE_DIRS})
+  IF(IS_DIRECTORY Source/${PDIR})
+    INCLUDE_DIRECTORIES("Source/${PDIR}")
+  ENDIF()
+ENDFOREACH()
+
+
 
 # Set compiler flags
 IF(MSVC)

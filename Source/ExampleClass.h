@@ -10,8 +10,8 @@ class ExampleClass {
         ExampleClass();
         ~ExampleClass();
 
-        inline int multiply(int a, int b);
-        void print_string(const string& str);
+        inline int multiply(int a, int b) const;
+        void print_string(const string& str) const;
 
 };
 

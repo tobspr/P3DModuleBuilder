@@ -18,10 +18,10 @@ and distributing your modules the matter of a single command / mouseclick.
 3. To compile your module, use:
 
     ```
-    python build.py <module-name>
+    python build.py
     ```
 
-This will generate a binary with the name `<module-name>.pyd` or `<module-name>.so` (depending on your platform) in the directory of the build script.
+This will ask you for a module name the first time you run it. After that, it will generate a binary with the name `<module-name>.pyd` or `<module-name>.so` (depending on your platform) in the directory of the build script.
 
 You can then simply import the module in python, like this:
 

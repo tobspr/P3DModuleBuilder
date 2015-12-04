@@ -13,6 +13,6 @@ ExampleClass::~ExampleClass() {
 }
 
 
-void ExampleClass::print_string(const string& str) {
+void ExampleClass::print_string(const string& str) const {
     cout << "String from python: " << str << endl;
 }
