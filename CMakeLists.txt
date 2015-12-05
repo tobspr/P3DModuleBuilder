@@ -32,7 +32,7 @@ if (WIN32)
   ENDIF()
 
   # These vars are based on the WIN_PANDA_PATH and usually are correct
-  set(PANDA_LIBRARY_DIRS "${WIN_PANDA_PATH}/lib")
+  set(PANDA_LIBRARY_DIRS "${WIN_PANDA_PATH}/lib/")
   set(PANDA_INCLUDE_DIR "${WIN_PANDA_PATH}/include") 
   set(PYTHON_LIBRARIES "${WIN_PANDA_PATH}/python/libs/python${PYTHONVER}.lib")
   set(PYTHON_INCLUDE_DIRS "${WIN_PANDA_PATH}/python/include")
@@ -50,8 +50,11 @@ if (WIN32)
   endforeach()
 
   # Link panda libraries
-  set(PANDA_LIBRARIES "libp3framework;libpanda;libpandaexpress;libp3dtool;libp3dtoolconfig;libp3direct;lib${INTERROGATE_LIB}")
+  set(PANDA_LIBRARIES "libp3framework;libpanda;libpandaexpress;libp3dtool;libp3dtoolconfig;libp3direct;${INTERROGATE_LIB}")
   link_directories("${PANDA_LIBRARY_DIRS}")
+
+
+  link_directories("${WIN_PANDA_PATH}/panda3d/")
 
 else()
 

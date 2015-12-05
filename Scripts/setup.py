@@ -21,11 +21,18 @@ def run_cmake(config):
     cmake_args += ['-DPYTHON_EXECUTABLE:STRING=' + sys.executable]
     cmake_args += ['-DPROJECT_NAME:STRING=' + config["module_name"]]
 
+    lib_prefix = "lib" if is_windows() else ""
+
     # Check for the right interrogate lib
     if PandaSystem.get_major_version() > 1 or PandaSystem.get_minor_version() > 9:
-        cmake_args += ['-DINTERROGATE_LIB:STRING=p3interrogatedb']
+        cmake_args += ["-DINTERROGATE_LIB:STRING=" + lib_prefix + "p3interrogatedb"]
     else:
-        cmake_args += ['-DINTERROGATE_LIB:STRING=panda']
+
+        # Buildbot versions do not have the core lib, instead try using libpanda
+        if not isfile(join_abs(get_panda_lib_path(), "core.lib")):
+            cmake_args += ["-DINTERROGATE_LIB:STRING=" + lib_prefix + "panda"]
+        else:
+            cmake_args += ["-DINTERROGATE_LIB:STRING=core"]
 
     if is_windows():
         # Specify 64-bit compiler when using a 64 bit panda sdk build

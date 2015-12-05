@@ -123,7 +123,7 @@ def get_compiler_name():
 
 def fatal_error(*args):
     """ Prints an error to stderr and then exits with a nonzero status code """
-    print("\n\n[!] FATAL ERROR:", *args, file=sys.stderr)
+    print("\n\n[!] FATAL ERROR:", *args, file=stderr)
     exit(1)
 
 
