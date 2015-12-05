@@ -107,13 +107,12 @@ include_directories("Source/")
 set(SOURCES ${SOURCES_H} ${SOURCES})
 
 # Collect subdirs for compiling
-file(GLOB_RECURSE POSSIBLE_DIRS Source/*)
+file(GLOB POSSIBLE_DIRS RELATIVE ${CMAKE_CURRENT_LIST_DIR} Source/*)
 FOREACH(PDIR ${POSSIBLE_DIRS})
-  IF(IS_DIRECTORY Source/${PDIR})
-    INCLUDE_DIRECTORIES("Source/${PDIR}")
+  IF(IS_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/${PDIR})
+    INCLUDE_DIRECTORIES("${PDIR}")
   ENDIF()
 ENDFOREACH()
-
 
 
 # Set compiler flags
