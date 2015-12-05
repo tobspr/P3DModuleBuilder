@@ -15,11 +15,11 @@ def make_output_dir():
     chdir(output_dir)
 
 
-def run_cmake(module_name):
+def run_cmake(config):
     """ Runs cmake in the output dir """
     cmake_args = ['-DCMAKE_BUILD_TYPE=Release']
     cmake_args += ['-DPYTHON_EXECUTABLE:STRING=' + sys.executable]
-    cmake_args += ['-DPROJECT_NAME:STRING=' + module_name]
+    cmake_args += ['-DPROJECT_NAME:STRING=' + config["module_name"]]
 
     # Check for the right interrogate lib
     if PandaSystem.get_major_version() > 1 or PandaSystem.get_minor_version() > 9:
@@ -27,11 +27,10 @@ def run_cmake(module_name):
     else:
         cmake_args += ['-DINTERROGATE_LIB:STRING=panda']
 
-
     if is_windows():
         # Specify 64-bit compiler when using a 64 bit panda sdk build
         bit_suffix = " Win64" if is_64_bit() else ""
-        cmake_args += ['-GVisual Studio 10 2010' + bit_suffix]
+        cmake_args += ['-G' + config["vc_version"] + bit_suffix]
 
     if is_windows():
         # Specify python version, but only on windows
@@ -41,7 +40,12 @@ def run_cmake(module_name):
     try_execute("cmake", join_abs(get_script_dir(), ".."), *cmake_args)
 
 
-def run_cmake_build():
+def run_cmake_build(config):
     """ Runs the cmake build which builds the final output """
-    try_execute("cmake", "--build", ".", "--config", "RelWithDebInfo")
+
+    configuration = "Release"
+    if config["generate_pdb"].lower() in ["1", "true", "yes", "y"]:
+        configuration = "RelWithDebInfo"
+
+    try_execute("cmake", "--build", ".", "--config", configuration)
 

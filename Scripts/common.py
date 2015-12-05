@@ -98,6 +98,7 @@ def first_existing_path(paths, required_file=None):
         debug_out("[-]", pth)
     fatal_error("Failed to match path")
 
+
 def is_64_bit():
     """ Returns whether the build system is 64 bit (=True) or 32 bit (=False) """
     return PandaSystem.get_platform() in ["win_amd64"]
@@ -159,6 +160,18 @@ def join_abs(*args):
     fname = Filename.from_os_specific(joined)
     fname.make_absolute()
     return fname.to_os_generic()
+
+
+def get_ini_conf(fname):
+    """ Very simple .ini file reader, with no error checking """
+    with open(fname, "r") as handle:
+        return {i.split("=")[0].strip(): i.split("=")[-1].strip() for i in handle.readlines() if i.strip()}
+
+
+def write_ini_conf(config, fname):
+    """ Very simple .ini file writer, with no error checking """
+    with open(fname, "w") as handle: 
+        handle.write(''.join("{}={}\n".format(k,v) for k,v in config.items()))
 
 if __name__ == "__main__":
 

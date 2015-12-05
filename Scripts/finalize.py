@@ -25,7 +25,7 @@ def find_binary():
     if is_windows():
 
         # Check the different Configurations
-        configurations = ["Release", "RelWithDebInfo"]
+        configurations = ["RelWithDebInfo", "Release"]
         target_file = MODULE_NAME + ".pyd"
 
         for config in configurations:

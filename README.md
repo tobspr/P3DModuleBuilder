@@ -20,6 +20,14 @@ and distributing your modules the matter of a single command / mouseclick.
 - Windows SDK 7.1 (be sure to tick the VC++ 64 bit compilers)
 
 
+**Notice:** If you want to use a different version of Visual Studio, you first need
+to make a Panda3D build compiled with that version (otherwise your module won't work,
+or crash randomly). After you did that, you can adjust the `config.ini` file with
+your desired Visual Studio version. You can get a list of supported version strings
+with `cmake --help`. Notice that you **don't have to specify `[arch]`** after the
+Generator name, the script automatically does that, depending on your panda build architecture. 
+
+
 
 ## Usage
 
@@ -43,4 +51,14 @@ test_class = ExampleClass()
 
 There is also a small example class contained in the source directory, which shows the
 basics of using interrogate.
+
+
+## Further configuration
+
+Further adjustments can be made in the `config.ini` file:
+
+- You can set `generate_pdb` to `0` or `1` to control whether a .PDB file is generated.
+- You can set `vc_version` to change the Visual Studio Version. See above!
+
+Please cleanup your built directories after changing the configuration!
 
