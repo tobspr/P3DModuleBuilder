@@ -17,9 +17,9 @@ def make_output_dir():
 
 def run_cmake(config):
     """ Runs cmake in the output dir """
-    cmake_args = ['-DCMAKE_BUILD_TYPE=Release']
-    cmake_args += ['-DPYTHON_EXECUTABLE:STRING=' + sys.executable]
-    cmake_args += ['-DPROJECT_NAME:STRING=' + config["module_name"]]
+    cmake_args = ["-DCMAKE_BUILD_TYPE=Release"]
+    cmake_args += ["-DPYTHON_EXECUTABLE:STRING=" + sys.executable]
+    cmake_args += ["-DPROJECT_NAME:STRING=" + config["module_name"]]
 
     lib_prefix = "lib" if is_windows() else ""
 
@@ -37,12 +37,17 @@ def run_cmake(config):
     if is_windows():
         # Specify 64-bit compiler when using a 64 bit panda sdk build
         bit_suffix = " Win64" if is_64_bit() else ""
-        cmake_args += ['-G' + config["vc_version"] + bit_suffix]
+        cmake_args += ["-G" + config["vc_version"] + bit_suffix]
 
     if is_windows():
         # Specify python version, but only on windows
         pyver = "{}{}".format(sys.version_info.major, sys.version_info.minor)
-        cmake_args += ['-DPYTHONVER:STRING=' + pyver]
+        cmake_args += ["-DPYTHONVER:STRING=" + pyver]
+
+    # Libraries
+    for lib in ["freetype", "bullet", "eigen"]:
+        if "use_lib_" + lib in config and config["use_lib_" + lib] in ["1", "yes", "y"]:
+            cmake_args += ["-DUSE_LIB_" + lib.upper() + "=TRUE"]
 
     try_execute("cmake", join_abs(get_script_dir(), ".."), *cmake_args)
 

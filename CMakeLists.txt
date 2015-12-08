@@ -7,7 +7,16 @@ set(CMAKE_BUILD_TYPE "Release")
 set(PYTHON_EXECUTABLE CACHE STRING "python")
 set(INTERROGATE_LIB CACHE STRING "p3interrogatedb")
 
+# Libraries
+set(USE_LIB_EIGEN CACHE BOOL TRUE)
+set(USE_LIB_BULLET CACHE BOOL FALSE)
+set(USE_LIB_FREETYPE CACHE BOOL FALSE)
 
+
+set(LIBRARIES "")
+
+
+# Windows - 32 and 64 bit
 if (WIN32)
   
   set(PYTHONVER CACHE STRING "27")
@@ -34,12 +43,34 @@ if (WIN32)
   # These vars are based on the WIN_PANDA_PATH and usually are correct
   set(PANDA_LIBRARY_DIRS "${WIN_PANDA_PATH}/lib/")
   set(PANDA_INCLUDE_DIR "${WIN_PANDA_PATH}/include") 
+
   set(PYTHON_LIBRARIES "${WIN_PANDA_PATH}/python/libs/python${PYTHONVER}.lib")
   set(PYTHON_INCLUDE_DIRS "${WIN_PANDA_PATH}/python/include")
 
-  set(BULLET_LIBRARIES "")
-  set(BULLET_INCLUDE_DIRS "${THIRDPARTY_DIR}/bullet/include")
-  set(EIGEN_INCLUDE_DIRS "${THIRDPARTY_DIR}/eigen/include")
+  # [LIB] Bullet
+  IF(USE_LIB_BULLET)
+    include_directories("${THIRDPARTY_DIR}/bullet/include/")
+    link_directories("${THIRDPARTY_DIR}/bullet/lib/")
+
+    # TODO: Might need more libs
+    IF(CMAKE_CL_32)
+      set(${LIBRARIES} "${LIBRARIES};LinearMath;BulletCollision;BulletDynamics;BulletSoftBody")
+    ELSE()
+      set(${LIBRARIES} "${LIBRARIES};LinearMath_x64;BulletCollision_x64;BulletDynamics_x64;BulletSoftBody_x64")
+    ENDIF()
+  ENDIF()
+
+  # [LIB] Eigen 3
+  IF(USE_LIB_EIGEN)
+    include_directories("THIRDPARTY_DIR}/eigen/include")
+  ENDIF()
+
+  # [LIB] Freetype
+  IF(USE_LIB_FREETYPE)
+    include_directories("${THIRDPARTY_DIR}/freetype/include")
+    link_directories("${THIRDPARTY_DIR}/freetype/lib")
+    set(${LIBRARIES} "${LIBRARIES};freetype")
+  ENDIF()
 
   # Check if all supplied files exist
   set(CHECK_PATHS ${PANDA_LIBRARY_DIRS} ${PANDA_INCLUDE_DIR} ${PYTHON_LIBRARIES} ${PYTHON_INCLUDE_DIRS})
@@ -53,23 +84,37 @@ if (WIN32)
   set(PANDA_LIBRARIES "libp3framework;libpanda;libpandaexpress;libp3dtool;libp3dtoolconfig;libp3direct;${INTERROGATE_LIB}")
   link_directories("${PANDA_LIBRARY_DIRS}")
 
-
-  link_directories("${WIN_PANDA_PATH}/panda3d/")
-
 else()
 
   find_package(PythonLibs REQUIRED)
   find_package(PythonInterp REQUIRED)
-  find_package(Bullet)
 
-  set(EIGEN_INCLUDE_DIRS "/usr/include/eigen3")
 
-  # Locate the headers
+  # [LIB] Bullet
+  IF(USE_LIB_BULLET)
+    find_package(Bullet REQUIRED)
+    include_directories(${BULLET_INCLUDE_DIRS})
+    set(${LIBRARIES} "${LIBRARIES};${BULLET_LIBRARIES}")
+  ENDIF()
+
+  # [LIB] Eigen 3
+  IF(USE_LIB_EIGEN)
+    include_directories("/usr/include/eigen3")
+  ENDIF()
+
+  # [LIB] Freetype
+  IF(USE_LIB_BULLET)
+    find_package(freetype REQUIRED)
+    include_directories(${FREETYPE_INCLUDE_DIRS})
+    set(${LIBRARIES} "${LIBRARIES};${FREETYPE_LIBRARIES}")
+  ENDIF()
+
+  # Locate the Panda3D headers
   find_path(PANDA_INCLUDE_DIR dtoolbase.h PATH_SUFFIXES panda3d)
 
-  # Locate the libraries
+  # Locate the Panda3D libraries
   set(PANDA_LIBRARIES "")
-  foreach(lib pandabullet p3framework panda pandaexpress p3dtool p3dtoolconfig p3direct ${INTERROGATE_LIB})
+  foreach(lib p3framework panda pandaexpress p3dtool p3dtoolconfig p3direct ${INTERROGATE_LIB})
     find_library(PANDA_LIBRARY_${lib} ${lib} PATH_SUFFIXES panda3d)
     set(PANDA_LIBRARIES "${PANDA_LIBRARIES};${PANDA_LIBRARY_${lib}}")
   endforeach()
@@ -83,14 +128,9 @@ else()
 
 endif()
 
-
 # Link panda includes / libraries
 include_directories("${PANDA_INCLUDE_DIR}")
-
-# Also link python includes / libraries
 include_directories("${PYTHON_INCLUDE_DIRS}")
-include_directories("${BULLET_INCLUDE_DIRS}")
-include_directories("${EIGEN_INCLUDE_DIRS}")
 
 # Run interrogate over the files
 EXECUTE_PROCESS(
@@ -103,20 +143,6 @@ EXECUTE_PROCESS(
 if(NOT ("${return_code}" STREQUAL "0"))
     message(FATAL_ERROR "Interrogate failed: ${output} ${errors}")
 endif()
-
-# Collect sources for compiling
-file(GLOB_RECURSE SOURCES Source/*.cpp)
-include_directories("Source/")
-set(SOURCES ${SOURCES_H} ${SOURCES})
-
-# Collect subdirs for compiling
-file(GLOB POSSIBLE_DIRS RELATIVE ${CMAKE_CURRENT_LIST_DIR} Source/*)
-FOREACH(PDIR ${POSSIBLE_DIRS})
-  IF(IS_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/${PDIR})
-    INCLUDE_DIRECTORIES("${PDIR}")
-  ENDIF()
-ENDFOREACH()
-
 
 # Set compiler flags
 IF(MSVC)
@@ -157,12 +183,24 @@ ENDIF()
 ADD_DEFINITIONS("/DPB_MODULE=${PROJECT_NAME}")
 ADD_DEFINITIONS("/DPB_CFG_MODULE=${PROJECT_NAME}")
 
+# Collect sources for compiling
+file(GLOB_RECURSE SOURCES Source/*.cpp)
+include_directories("Source/")
+set(SOURCES ${SOURCES_H} ${SOURCES})
+
+# Collect subdirs for compiling
+file(GLOB POSSIBLE_DIRS RELATIVE ${CMAKE_CURRENT_LIST_DIR} Source/*)
+FOREACH(PDIR ${POSSIBLE_DIRS})
+  IF(IS_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/${PDIR})
+    INCLUDE_DIRECTORIES("${PDIR}")
+  ENDIF()
+ENDFOREACH()
+
 # Build library
 add_library(${PROJECT_NAME} MODULE ${SOURCES})
 
 # Don't add lib prefix on Linux
 set_target_properties(${PROJECT_NAME} PROPERTIES PREFIX "")
-
 
 FOREACH (flags_var_to_scrub
     CMAKE_CXX_FLAGS_RELEASE
@@ -176,7 +214,7 @@ FOREACH (flags_var_to_scrub
 ENDFOREACH()
 
 # Add the required libraries
-target_link_libraries(${PROJECT_NAME} ${PYTHON_LIBRARIES} ${PANDA_LIBRARIES} ${BULLET_LIBRARIES})
+target_link_libraries(${PROJECT_NAME} ${PYTHON_LIBRARIES} ${PANDA_LIBRARIES} ${LIBRARIES})
 
 
 # After building, copy the file to the current directory
