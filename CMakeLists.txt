@@ -184,7 +184,7 @@ ADD_DEFINITIONS("/DPB_MODULE=${PROJECT_NAME}")
 ADD_DEFINITIONS("/DPB_CFG_MODULE=${PROJECT_NAME}")
 
 # Collect sources for compiling
-file(GLOB_RECURSE SOURCES Source/*.cpp)
+file(GLOB_RECURSE SOURCES Source/*.cpp Source/*.cxx)
 include_directories("Source/")
 set(SOURCES ${SOURCES_H} ${SOURCES})
 
