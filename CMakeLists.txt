@@ -62,7 +62,7 @@ if (WIN32)
 
   # [LIB] Eigen 3
   IF(USE_LIB_EIGEN)
-    include_directories("THIRDPARTY_DIR}/eigen/include")
+    include_directories("${THIRDPARTY_DIR}/eigen/include")
   ENDIF()
 
   # [LIB] Freetype
