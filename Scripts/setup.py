@@ -39,10 +39,12 @@ def run_cmake(config):
         bit_suffix = " Win64" if is_64_bit() else ""
         cmake_args += ["-G" + config["vc_version"] + bit_suffix]
 
-    if is_windows():
-        # Specify python version, but only on windows
-        pyver = "{}{}".format(sys.version_info.major, sys.version_info.minor)
-        cmake_args += ["-DPYTHONVER:STRING=" + pyver]
+
+    # Specify python version
+    pyver = "{}{}".format(sys.version_info.major, sys.version_info.minor)
+    pyver_dot = "{}.{}".format(sys.version_info.major, sys.version_info.minor)
+    cmake_args += ["-DPYTHONVER:STRING=" + pyver]
+    cmake_args += ["-DPYTHONVERDOT:STRING=" + pyver_dot]
 
     # Libraries
     for lib in ["freetype", "bullet", "eigen"]:

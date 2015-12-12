@@ -12,6 +12,8 @@ set(USE_LIB_EIGEN CACHE BOOL TRUE)
 set(USE_LIB_BULLET CACHE BOOL FALSE)
 set(USE_LIB_FREETYPE CACHE BOOL FALSE)
 
+set(PYTHONVER CACHE STRING "27")
+set(DPYTHONVERDOT CACHE STRING "2.7")
 
 set(LIBRARIES "")
 
@@ -19,7 +21,6 @@ set(LIBRARIES "")
 # Windows - 32 and 64 bit
 if (WIN32)
   
-  set(PYTHONVER CACHE STRING "27")
   
   # Find panda path
   EXECUTE_PROCESS(
@@ -86,9 +87,8 @@ if (WIN32)
 
 else()
 
+  set(Python_ADDITIONAL_VERSIONS ${DPYTHONVERDOT})
   find_package(PythonLibs REQUIRED)
-  find_package(PythonInterp REQUIRED)
-
 
   # [LIB] Bullet
   IF(USE_LIB_BULLET)
