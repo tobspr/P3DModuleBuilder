@@ -67,8 +67,10 @@ def run_cmake_build(config):
 
     core_option = ""
     if is_linux():
-        core_option = "-j " + str(num_cores)
+        # On linux, use all available cores
+        core_option = "-j" + str(num_cores)
     if is_windows():
+        # Specifying no cpu count makes MSBuild use all available ones
         core_option = "/m"
 
 
