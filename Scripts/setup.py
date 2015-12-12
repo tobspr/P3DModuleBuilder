@@ -67,7 +67,10 @@ def run_cmake_build(config):
 
     core_option = ""
     if is_linux():
-        core_option = "-j" + str(num_cores)
+        core_option = "-j " + str(num_cores)
+    if is_windows():
+        core_option = "/m"
 
-    try_execute("cmake", "--build", ".", "--config", configuration, core_option)
+
+    try_execute("cmake", "--build", ".", "--config", configuration, "--", core_option)
 
