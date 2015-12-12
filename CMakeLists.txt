@@ -113,8 +113,11 @@ else()
   find_path(PANDA_INCLUDE_DIR dtoolbase.h PATH_SUFFIXES panda3d)
 
   # Locate the Panda3D libraries
+
+  set(REQ_LIBRARIES p3framework panda pandaexpress p3dtool p3dtoolconfig p3direct ${INTERROGATE_LIB})
+
   set(PANDA_LIBRARIES "")
-  foreach(lib p3framework panda pandaexpress p3dtool p3dtoolconfig p3direct ${INTERROGATE_LIB})
+  foreach(lib ${REQ_LIBRARIES})
     find_library(PANDA_LIBRARY_${lib} ${lib} PATH_SUFFIXES panda3d)
     set(PANDA_LIBRARIES "${PANDA_LIBRARIES};${PANDA_LIBRARY_${lib}}")
   endforeach()
@@ -123,7 +126,28 @@ else()
                                     PANDA_LIBRARIES PANDA_INCLUDE_DIR)
 
   if(NOT EXISTS ${PANDA_INCLUDE_DIR})
-    message(FATAL_ERROR "Could not find panda3d headers!")
+
+    # Okay, the standard package handling failed. Try finding a local panda3d installation
+
+    # Find panda path
+    EXECUTE_PROCESS(
+      COMMAND "${PYTHON_EXECUTABLE}" "-B" "Scripts/common.py" "--print-sdk-path"
+      OUTPUT_VARIABLE LOCAL_PANDA_PATH
+      WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR})
+
+    if(NOT EXISTS "${LOCAL_PANDA_PATH}/include")
+      message(FATAL_ERROR "Could not find system wide panda3d headers, and no local installation was found!")
+    endif()
+
+    set(PANDA_INCLUDE_DIR "${LOCAL_PANDA_PATH}/include")
+
+    set(PANDA_LIBRARIES "")
+    foreach(lib ${REQ_LIBRARIES})
+      find_library(PANDA_LIBRARY_${lib} ${lib} PATHS "${LOCAL_PANDA_PATH}/lib/")
+      set(PANDA_LIBRARIES "${PANDA_LIBRARIES};${PANDA_LIBRARY_${lib}}")
+    endforeach()
+
+
   endif()
 
 endif()
