@@ -59,6 +59,12 @@ Further adjustments can be made in the `config.ini` file:
 
 - You can set `generate_pdb` to `0` or `1` to control whether a .PDB file is generated.
 - You can set `vc_version` to change the Visual Studio Version. See above!
+- You can set `use_lib_eigen` to `1` to require the Eigen 3 library
+- You can set `use_lib_bullet` to `1` to require the Bullet library
+- You can set `use_lib_freetype` to `1` to require the Freetype library
 
-Please cleanup your built directories after changing the configuration!
+Notice that if you use the `use_lib_xxx`, you need to use a Panda3D build which uses
+that library, too. Otherwise you might (and will) get linker errors.
+
+**Please cleanup your built directories after changing the configuration!**
 
