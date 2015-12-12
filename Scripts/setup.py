@@ -1,10 +1,12 @@
 
 import sys
+import multiprocessing
 from os import chdir
 from os.path import join, isdir
 from panda3d.core import PandaSystem
 
 from common import *
+
 
 def make_output_dir():
     """ Creates the output directory and sets the CWD into that directory """
@@ -53,7 +55,6 @@ def run_cmake(config):
 
     try_execute("cmake", join_abs(get_script_dir(), ".."), *cmake_args)
 
-
 def run_cmake_build(config):
     """ Runs the cmake build which builds the final output """
 
@@ -61,5 +62,12 @@ def run_cmake_build(config):
     if config["generate_pdb"].lower() in ["1", "true", "yes", "y"]:
         configuration = "RelWithDebInfo"
 
-    try_execute("cmake", "--build", ".", "--config", configuration)
+    # get number of cores
+    num_cores = multiprocessing.cpu_count()
+
+    core_option = ""
+    if is_linux():
+        core_option = "-j" + str(num_cores)
+
+    try_execute("cmake", "--build", ".", "--config", configuration, core_option)
 
