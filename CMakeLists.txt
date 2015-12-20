@@ -99,7 +99,7 @@ else()
 
   # [LIB] Eigen 3
   IF(USE_LIB_EIGEN)
-    include_directories("/usr/include/eigen3")
+    include_directories(BEFORE "/usr/include/eigen3/")
   ENDIF()
 
   # [LIB] Freetype
