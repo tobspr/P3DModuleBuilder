@@ -5,7 +5,7 @@ from os import chdir
 from os.path import join, isdir
 from panda3d.core import PandaSystem
 
-from common import *
+from .common import *
 
 
 def make_output_dir():
