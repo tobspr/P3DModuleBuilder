@@ -7,7 +7,7 @@ import platform
 from shutil import copyfile
 from os.path import isfile, join, dirname, realpath, isdir
 from panda3d.core import PandaSystem
-from .common import *
+from common import *
 
 
 def find_binary():
