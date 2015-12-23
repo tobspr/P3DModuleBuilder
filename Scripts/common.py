@@ -173,7 +173,7 @@ def get_ini_conf(fname):
 def write_ini_conf(config, fname):
     """ Very simple .ini file writer, with no error checking """
     with open(fname, "w") as handle: 
-        handle.write(''.join("{}={}\n".format(k,v) for k,v in config.items()))
+        handle.write(''.join("{}={}\n".format(k,v) for k,v in sorted(config.items())))
 
 if __name__ == "__main__":
 
