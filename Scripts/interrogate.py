@@ -9,7 +9,7 @@ import sys
 from os import listdir, chdir
 from os.path import join, isfile, isdir
 
-from .common import *
+from common import *
 
 if len(sys.argv) != 2:
     debug_out("Usage: python interrogate.py <module-name>")
