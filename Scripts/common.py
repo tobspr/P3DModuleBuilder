@@ -5,6 +5,7 @@ Common functions for the build system
 """
 from __future__ import print_function
 
+import sys
 import subprocess
 import platform
 from os.path import dirname, realpath, join, isdir, isfile
@@ -14,8 +15,9 @@ from panda3d.core import PandaSystem, Filename, ExecutionEnvironment
 
 def get_output_name():
     """ Returns the name of the output dir, depending on the system architecture """
-    return PandaSystem.getPlatform().lower()
-
+    return PandaSystem.getPlatform().lower() + "_py{}{}".format(
+        sys.version_info.major, sys.version_info.minor)
+    
 
 def get_script_dir():
     """ Returns the name of the directory the scripts are located in """
