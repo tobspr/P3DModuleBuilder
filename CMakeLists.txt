@@ -12,8 +12,7 @@ set(USE_LIB_EIGEN CACHE BOOL TRUE)
 set(USE_LIB_BULLET CACHE BOOL FALSE)
 set(USE_LIB_FREETYPE CACHE BOOL FALSE)
 
-set(PYTHONVER CACHE STRING "27")
-set(PYTHONVERDOT CACHE STRING "2.7")
+
 
 set(LIBRARIES "")
 
@@ -21,6 +20,7 @@ set(LIBRARIES "")
 # Windows - 32 and 64 bit
 if (WIN32)
   
+  set(PYTHONVER CACHE STRING "27")
   
   # Find panda path
   EXECUTE_PROCESS(
@@ -86,7 +86,7 @@ if (WIN32)
   link_directories("${PANDA_LIBRARY_DIRS}")
 
 else()
-
+  set(PYTHONVERDOT CACHE STRING "2.7")
   set(Python_ADDITIONAL_VERSIONS ${PYTHONVERDOT})
   find_package(PythonLibs REQUIRED)
 

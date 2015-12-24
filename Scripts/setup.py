@@ -42,11 +42,15 @@ def run_cmake(config):
         cmake_args += ["-G" + config["vc_version"] + bit_suffix]
 
 
-    # Specify python version
+    # Specify python version, once as integer, once seperated by a dot
     pyver = "{}{}".format(sys.version_info.major, sys.version_info.minor)
     pyver_dot = "{}.{}".format(sys.version_info.major, sys.version_info.minor)
-    cmake_args += ["-DPYTHONVER:STRING=" + pyver]
-    cmake_args += ["-DPYTHONVERDOT:STRING=" + pyver_dot]
+
+    if is_windows():
+        cmake_args += ["-DPYTHONVER:STRING=" + pyver]
+    
+    if is_linux():
+        cmake_args += ["-DPYTHONVERDOT:STRING=" + pyver_dot]
 
     # Libraries
     for lib in ["freetype", "bullet", "eigen"]:
