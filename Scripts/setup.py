@@ -19,7 +19,12 @@ def make_output_dir():
 
 def run_cmake(config):
     """ Runs cmake in the output dir """
-    cmake_args = ["-DCMAKE_BUILD_TYPE=Release"]
+
+    configuration = "Release"
+    if config["generate_pdb"].lower() in ["1", "true", "yes", "y"]:
+        configuration = "RelWithDebInfo"
+
+    cmake_args = ["-DCMAKE_BUILD_TYPE=" + configuration]
     cmake_args += ["-DPYTHON_EXECUTABLE:STRING=" + sys.executable]
     cmake_args += ["-DPROJECT_NAME:STRING=" + config["module_name"]]
 
