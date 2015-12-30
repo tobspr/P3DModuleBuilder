@@ -1,4 +1,5 @@
 
+import shutil
 import sys
 import multiprocessing
 from os import chdir
@@ -8,16 +9,23 @@ from panda3d.core import PandaSystem
 from .common import *
 
 
-def make_output_dir():
-    """ Creates the output directory and sets the CWD into that directory """
+def make_output_dir(clean=False):
+    """ Creates the output directory and sets the CWD into that directory. If
+    clean is True, the output dir will be cleaned up. """
     output_dir = get_output_dir()
+
+    # Cleanup output directory in case clean is specified
+    if isdir(output_dir) and clean:
+        print("Cleaning up output directory ..")
+        shutil.rmtree(output_dir)
+
     try_makedir(output_dir)
     if not isdir(output_dir):
         fatal_error("Could not create output directory at:", output_dir)
     chdir(output_dir)
 
 
-def run_cmake(config):
+def run_cmake(config, args):
     """ Runs cmake in the output dir """
 
     configuration = "Release"
@@ -62,9 +70,20 @@ def run_cmake(config):
         if "use_lib_" + lib in config and config["use_lib_" + lib] in ["1", "yes", "y"]:
             cmake_args += ["-DUSE_LIB_" + lib.upper() + "=TRUE"]
 
+    # Optimization level
+    optimize = 3
+    if args.optimize is None:
+        # No optimization level set. Try to find it in the config
+        if "optimize" in config:
+            optimize = config["optimize"]
+    else:
+        optimize = args.optimize
+
+    cmake_args += ["-DOPTIMIZE=" + str(optimize)]
+
     try_execute("cmake", join_abs(get_script_dir(), ".."), *cmake_args)
 
-def run_cmake_build(config):
+def run_cmake_build(config, args):
     """ Runs the cmake build which builds the final output """
 
     configuration = "Release"

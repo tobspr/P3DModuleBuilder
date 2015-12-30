@@ -3,19 +3,36 @@ set(PROJECT_NAME CACHE STRING "Module")
 
 cmake_minimum_required (VERSION 2.6)
 project (${PROJECT_NAME})
-set(CMAKE_BUILD_TYPE "Release")
-set(PYTHON_EXECUTABLE CACHE STRING "python")
-set(INTERROGATE_LIB CACHE STRING "p3interrogatedb")
 
-# Libraries
+# Project configuration
+set(CMAKE_BUILD_TYPE "Release")
+
+# Libraries and options set by the module builder
 set(USE_LIB_EIGEN CACHE BOOL TRUE)
 set(USE_LIB_BULLET CACHE BOOL FALSE)
 set(USE_LIB_FREETYPE CACHE BOOL FALSE)
+set(OPTIMIZE CACHE STRING "3")
+set(INTERROGATE_LIB CACHE STRING "p3interrogatedb")
+set(PYTHON_EXECUTABLE CACHE STRING "python")
 
+
+# --- User controllable variables ---
+
+# Whether to enable SSE. This only has effect on 32 bit.
+# Should probably match the setting for the Panda3D build
+set(ENABLE_SSE2 CACHE BOOL 1)
+set(TOUCHINPUT_ENABLED CACHE BOOL 0)
+
+
+# --- End of user variables --
+
+# Reset cmake flags - we user our own
+set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "")
+set(CMAKE_CXX_FLAGS_RELEASE "")
+set(CMAKE_CXX_FLAGS_MINSIZEREL "")
 
 
 set(LIBRARIES "")
-
 
 # Windows - 32 and 64 bit
 if (WIN32)
@@ -23,23 +40,23 @@ if (WIN32)
   set(PYTHONVER CACHE STRING "27")
   
   # Find panda path
-  EXECUTE_PROCESS(
+  execute_process(
     COMMAND "${PYTHON_EXECUTABLE}" "-B" "Scripts/common.py" "--print-sdk-path"
     OUTPUT_VARIABLE WIN_PANDA_PATH
     WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR})
 
   # Find thirdparty directory
-  IF(CMAKE_CL_32)
+  if (CMAKE_CL_32)
     set(THIRDPARTY_DIR "${WIN_PANDA_PATH}/../thirdparty/win-libs-vc10")
-    IF(NOT (EXISTS "${THIRDPARTY_DIR}"))
+    if (NOT (EXISTS "${THIRDPARTY_DIR}"))
       set(THIRDPARTY_DIR "${WIN_PANDA_PATH}/thirdparty/win-libs-vc10")
-    ENDIF()
-  ELSE()
-    set(THIRDPARTY_DIR "${WIN_PANDA_PATH}/../thirdparty/win-libs-vc10-x64")
-    IF(NOT (EXISTS "${THIRDPARTY_DIR}"))
-      set(THIRDPARTY_DIR "${WIN_PANDA_PATH}/thirdparty/win-libs-vc10-x64")
-    ENDIF()
-  ENDIF()
+    endif()
+  else()
+    set (THIRDPARTY_DIR "${WIN_PANDA_PATH}/../thirdparty/win-libs-vc10-x64")
+    if (NOT (EXISTS "${THIRDPARTY_DIR}"))
+      set (THIRDPARTY_DIR "${WIN_PANDA_PATH}/thirdparty/win-libs-vc10-x64")
+    endif()
+  endif()
 
   # These vars are based on the WIN_PANDA_PATH and usually are correct
   set(PANDA_LIBRARY_DIRS "${WIN_PANDA_PATH}/lib/")
@@ -49,29 +66,29 @@ if (WIN32)
   set(PYTHON_INCLUDE_DIRS "${WIN_PANDA_PATH}/python/include")
 
   # [LIB] Bullet
-  IF(USE_LIB_BULLET)
+  if(USE_LIB_BULLET)
     include_directories("${THIRDPARTY_DIR}/bullet/include/")
     link_directories("${THIRDPARTY_DIR}/bullet/lib/")
 
     # TODO: Might need more libs
-    IF(CMAKE_CL_32)
+    if(CMAKE_CL_32)
       set(${LIBRARIES} "${LIBRARIES};LinearMath;BulletCollision;BulletDynamics;BulletSoftBody")
-    ELSE()
+    else()
       set(${LIBRARIES} "${LIBRARIES};LinearMath_x64;BulletCollision_x64;BulletDynamics_x64;BulletSoftBody_x64")
-    ENDIF()
-  ENDIF()
+    endif()
+  endif()
 
   # [LIB] Eigen 3
-  IF(USE_LIB_EIGEN)
+  if (USE_LIB_EIGEN)
     include_directories("${THIRDPARTY_DIR}/eigen/include")
-  ENDIF()
+  endif()
 
   # [LIB] Freetype
-  IF(USE_LIB_FREETYPE)
+  if (USE_LIB_FREETYPE)
     include_directories("${THIRDPARTY_DIR}/freetype/include")
     link_directories("${THIRDPARTY_DIR}/freetype/lib")
     set(${LIBRARIES} "${LIBRARIES};freetype")
-  ENDIF()
+  endif()
 
   # Check if all supplied files exist
   set(CHECK_PATHS ${PANDA_LIBRARY_DIRS} ${PANDA_INCLUDE_DIR} ${PYTHON_LIBRARIES} ${PYTHON_INCLUDE_DIRS})
@@ -91,23 +108,23 @@ else()
   find_package(PythonLibs REQUIRED)
 
   # [LIB] Bullet
-  IF(USE_LIB_BULLET)
+  if (USE_LIB_BULLET)
     find_package(Bullet REQUIRED)
     include_directories(${BULLET_INCLUDE_DIRS})
     set(${LIBRARIES} "${LIBRARIES};${BULLET_LIBRARIES}")
-  ENDIF()
+  endif()
 
   # [LIB] Eigen 3
-  IF(USE_LIB_EIGEN)
+  if (USE_LIB_EIGEN)
     include_directories(BEFORE "/usr/include/eigen3/")
-  ENDIF()
+  endif()
 
   # [LIB] Freetype
-  IF(USE_LIB_BULLET)
+  if(USE_LIB_BULLET)
     find_package(freetype REQUIRED)
     include_directories(${FREETYPE_INCLUDE_DIRS})
     set(${LIBRARIES} "${LIBRARIES};${FREETYPE_LIBRARIES}")
-  ENDIF()
+  endif()
 
   # Locate the Panda3D headers
   find_path(PANDA_INCLUDE_DIR dtoolbase.h PATH_SUFFIXES panda3d)
@@ -117,7 +134,7 @@ else()
   set(REQ_LIBRARIES p3framework panda pandaexpress p3dtool p3dtoolconfig p3direct ${INTERROGATE_LIB})
 
   set(PANDA_LIBRARIES "")
-  foreach(lib ${REQ_LIBRARIES})
+  foreach (lib ${REQ_LIBRARIES})
     find_library(PANDA_LIBRARY_${lib} ${lib} PATH_SUFFIXES panda3d)
     set(PANDA_LIBRARIES "${PANDA_LIBRARIES};${PANDA_LIBRARY_${lib}}")
   endforeach()
@@ -125,17 +142,16 @@ else()
   find_package_handle_standard_args(Panda DEFAULT_MSG
                                     PANDA_LIBRARIES PANDA_INCLUDE_DIR)
 
-  if(NOT EXISTS ${PANDA_INCLUDE_DIR})
-
+  if (NOT EXISTS ${PANDA_INCLUDE_DIR})
     # Okay, the standard package handling failed. Try finding a local panda3d installation
 
     # Find panda path
-    EXECUTE_PROCESS(
+    execute_process(
       COMMAND "${PYTHON_EXECUTABLE}" "-B" "Scripts/common.py" "--print-sdk-path"
       OUTPUT_VARIABLE LOCAL_PANDA_PATH
       WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR})
 
-    if(NOT EXISTS "${LOCAL_PANDA_PATH}/include")
+    if (NOT EXISTS "${LOCAL_PANDA_PATH}/include")
       message(FATAL_ERROR "Could not find system wide panda3d headers, and no local installation was found!")
     endif()
 
@@ -157,7 +173,7 @@ include_directories("${PANDA_INCLUDE_DIR}")
 include_directories("${PYTHON_INCLUDE_DIRS}")
 
 # Run interrogate over the files
-EXECUTE_PROCESS(
+execute_process(
     COMMAND "${PYTHON_EXECUTABLE}" "-B" "Scripts/interrogate.py" "${PROJECT_NAME}"
     OUTPUT_VARIABLE output
     ERROR_VARIABLE errors
@@ -169,43 +185,98 @@ if(NOT ("${return_code}" STREQUAL "0"))
 endif()
 
 # Set compiler flags
-IF(MSVC)
+if (MSVC)
 
-    IF(CMAKE_CL_64)
-      ADD_DEFINITIONS("/favor:blend /DWIN64_VC /DWIN64")
-    ENDIF()
+  # This matches the makepanda options
 
-    ADD_DEFINITIONS("/wd4996")
-    ADD_DEFINITIONS("/wd4275")
-    ADD_DEFINITIONS("/wd4267")
-    ADD_DEFINITIONS("/wd4101")
-    ADD_DEFINITIONS("/wd4018")
-    ADD_DEFINITIONS("/wd4273")
-    # ADD_DEFINITIONS("/DWINVER=0x601")
-    ADD_DEFINITIONS("/GR-")
-    # ADD_DEFINITIONS("/O2")
-    ADD_DEFINITIONS("/MD /Zi /GS- /Ob2 /Oi /Ot /fp:fast")
-    ADD_DEFINITIONS("/Zm300 /DWIN32_VC /DWIN32")
+  if (CMAKE_CL_64)
+    add_definitions("/favor:blend /DWIN64_VC /DWIN64 /bigobj")
+  endif()
 
-    IF(CMAKE_CL_32)
-      ADD_DEFINITIONS("/DWIN64_VC /DWIN64")
-      ADD_DEFINITIONS("/machine:x86")
-    ENDIF()
+  add_definitions("/wd4996 /wd4275 /wd4267 /wd4101 /wd4273")
 
-    ADD_DEFINITIONS("/W3")
-    ADD_DEFINITIONS("/DEBUG")
+  if (TOUCHINPUT_ENABLED)
+    # If touchinput is enabled
+    add_definitions("/DWINVER=0x601")
+  else()
+    # If touchinput is disabled
+    # add_definitions("/DWINVER=0x501")
+  endif()
 
-    set(CMAKE_SHARED_LINKER_FLAGS_RELEASE "${CMAKE_SHARED_LINKER_FLAGS_RELEASE} /PDB /DEBUG /OPT:REF /OPT:ICF")
-    set(CMAKE_SHARED_LINKER_FLAGS_MINSIZEREL "${CMAKE_SHARED_LINKER_FLAGS_MINSIZEREL} /PDB /DEBUG /OPT:REF /OPT:ICF")
-    set(CMAKE_SHARED_LINKER_FLAGS_RELWITHDEBINFO "${CMAKE_SHARED_LINKER_FLAGS_RELWITHDEBINFO} /PDB /DEBUG /OPT:REF /OPT:ICF")
+  if(CMAKE_CL_32 AND ENABLE_SSE2)
+    # If SSE is enabled
+    add_definitions("/arch:SSE2")
+  endif()
+
+  # Different optimization settings
+  if (OPTIMIZE STREQUAL "1")
+    add_definitions("/MDd /Zi /RTCs /GS")
+  elseif(OPTIMIZE STREQUAL "2")
+    add_definitions("/MDd /Zi")
+  elseif(OPTIMIZE STREQUAL "3")
+    add_definitions("/MD /Zi /GS- /O2 /Ob2 /Oi /Ot /fp:fast")
+  elseif(OPTIMIZE STREQUAL "4")
+    add_definitions("/MD /Zi /GS- /Ox /Ob2 /Oi /Ot /fp:fast /DFORCE_INLINING /DNDEBUG /GL /LTCG")
+    add_definitions("/Oy /Zp16")
+  else()
+    message(FATAL_ERROR "Invalid optimize value! Was: '${OPTIMIZE}'")
+  endif()
+
+  add_definitions("/Zm300 /DWIN32_VC /DWIN32")
+
+  # No exceptions
+  add_definitions("/D_HAS_EXCEPTIONS=0")
+
+  # No RTTI
+  add_definitions("/GR-")
+
+  # Warning level 3 should be enough
+  add_definitions("/W3")
+  
+  # Special case for 32 bit
+  if(CMAKE_CL_32)
+    add_definitions("/machine:x86")
+  endif()
 
 ELSE()
-   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mtune=native -march=native -std=c++11")
+  
+  # Assuming GCC here
+
+  add_definitions("-ftemplate-depth-70 -fPIC -c")
+
+  # On mac
+  if (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+    add_definitions("-Wno-deprecated-declarations")
+  endif()
+
+  add_definitions("-pthread")
+  add_definitions("-mtune=native -march=native -std=c++11")
+
+  # No exceptions
+  add_definitions("-fno-exceptions")
+
+  # No RTTI
+  add_definitions("-fno-rtti")
+
+  # Differnt optimization settings
+  if (OPTIMIZE STREQUAL "1")
+    add_definitions("-ggdb -D_DEBUG")
+  elseif(OPTIMIZE STREQUAL "2")
+    add_definitions("-O1 -D_DEBUG")
+  elseif(OPTIMIZE STREQUAL "3")
+    add_definitions("-O2")
+    add_definitions("-fno-finite-math-only -ffast-math")
+  elseif(OPTIMIZE STREQUAL "4")
+    add_definitions("-O3 -DNDEBUG -ffast-math")
+  else()
+    message(FATAL_ERROR "Invalid optimize value! Was: '${OPTIMIZE}'")
+  endif()
+
 ENDIF()
 
 # Define the module name
-ADD_DEFINITIONS("/DPB_MODULE=${PROJECT_NAME}")
-ADD_DEFINITIONS("/DPB_CFG_MODULE=${PROJECT_NAME}")
+add_definitions("/DPB_MODULE=${PROJECT_NAME}")
+add_definitions("/DPB_CFG_MODULE=${PROJECT_NAME}")
 
 # Collect sources for compiling
 file(GLOB_RECURSE SOURCES Source/*.cpp Source/*.cxx)
@@ -214,11 +285,11 @@ set(SOURCES ${SOURCES_H} ${SOURCES})
 
 # Collect subdirs for compiling
 file(GLOB POSSIBLE_DIRS RELATIVE ${CMAKE_CURRENT_LIST_DIR} Source/*)
-FOREACH(PDIR ${POSSIBLE_DIRS})
-  IF(IS_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/${PDIR})
-    INCLUDE_DIRECTORIES("${PDIR}")
-  ENDIF()
-ENDFOREACH()
+foreach(PDIR ${POSSIBLE_DIRS})
+  if (IS_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/${PDIR})
+    include_directories("${PDIR}")
+  endif()
+endforeach()
 
 # Build library
 add_library(${PROJECT_NAME} MODULE ${SOURCES})
@@ -226,20 +297,8 @@ add_library(${PROJECT_NAME} MODULE ${SOURCES})
 # Don't add lib prefix on Linux
 set_target_properties(${PROJECT_NAME} PROPERTIES PREFIX "")
 
-FOREACH (flags_var_to_scrub
-    CMAKE_CXX_FLAGS_RELEASE
-    CMAKE_CXX_FLAGS_RELWITHDEBINFO
-    CMAKE_CXX_FLAGS_MINSIZEREL
-    CMAKE_C_FLAGS_RELEASE
-    CMAKE_C_FLAGS_RELWITHDEBINFO
-    CMAKE_C_FLAGS_MINSIZEREL)
-  string (REGEX REPLACE "(^| )[/-]D *NDEBUG($| )" " "
-    "${flags_var_to_scrub}" "${${flags_var_to_scrub}}")
-ENDFOREACH()
-
 # Add the required libraries
 target_link_libraries(${PROJECT_NAME} ${PYTHON_LIBRARIES} ${PANDA_LIBRARIES} ${LIBRARIES})
-
 
 # After building, copy the file to the current directory
 add_custom_command(
@@ -247,5 +306,3 @@ add_custom_command(
     POST_BUILD
     COMMAND "${PYTHON_EXECUTABLE}" "-B" "${CMAKE_CURRENT_LIST_DIR}/Scripts/finalize.py" "${PROJECT_NAME}"
     WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR})
-
-
