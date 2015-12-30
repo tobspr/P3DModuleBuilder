@@ -256,7 +256,7 @@ ELSE()
   add_definitions("-fno-exceptions")
 
   # No RTTI
-  add_definitions("-fno-rtti")
+  # add_definitions("-fno-rtti")
 
   # Differnt optimization settings
   if (OPTIMIZE STREQUAL "1")
