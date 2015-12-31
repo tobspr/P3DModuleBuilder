@@ -141,15 +141,22 @@ def try_makedir(dirname):
         makedirs(dirname)
     except: pass
 
-def try_execute(*args):
+def try_execute(*args, **kwargs):
     """ Tries to execute the given process, if everything wents good, it just
     returns, otherwise it prints the output to stderr and exits with a nonzero
     status code """
     debug_out("Executing command: ", ' '.join(args), "\n")
     try:
-        output = subprocess.check_output(args, bufsize=1, stderr=subprocess.STDOUT)
-        debug_out("Process output: ")
-        debug_out(output)
+        if "verbose" in kwargs and kwargs["verbose"]:
+            process = subprocess.Popen(args)
+            process.communicate()
+            if process.returncode != 0:
+                raise Exception("Return-Code: " + str(process.returncode))
+
+        else:
+            output = subprocess.check_output(args, bufsize=1, stderr=subprocess.STDOUT)
+            debug_out("Process output: ")
+            debug_out(output)
     except subprocess.CalledProcessError as msg:
         debug_out("Process error:")
         debug_out(msg.output)

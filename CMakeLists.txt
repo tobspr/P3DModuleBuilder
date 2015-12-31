@@ -12,6 +12,7 @@ set(USE_LIB_EIGEN CACHE BOOL TRUE)
 set(USE_LIB_BULLET CACHE BOOL FALSE)
 set(USE_LIB_FREETYPE CACHE BOOL FALSE)
 set(OPTIMIZE CACHE STRING "3")
+set(IGATE_VERBOSE CACHE STRING "0")
 set(INTERROGATE_LIB CACHE STRING "p3interrogatedb")
 set(PYTHON_EXECUTABLE CACHE STRING "python")
 
@@ -174,11 +175,16 @@ include_directories("${PYTHON_INCLUDE_DIRS}")
 
 # Run interrogate over the files
 execute_process(
-    COMMAND "${PYTHON_EXECUTABLE}" "-B" "Scripts/interrogate.py" "${PROJECT_NAME}"
+    COMMAND "${PYTHON_EXECUTABLE}" "-B" "Scripts/interrogate.py" "${PROJECT_NAME}" "${IGATE_VERBOSE}"
     OUTPUT_VARIABLE output
     ERROR_VARIABLE errors
     RESULT_VARIABLE return_code
     WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR})
+
+if (NOT ("${IGATE_VERBOSE}" STREQUAL "0" ))
+  message(STATUS "IGATE stdout = ${output}")
+  message(STATUS "IGATE stderr = ${errors}")
+endif()
 
 if(NOT ("${return_code}" STREQUAL "0"))
     message(FATAL_ERROR "Interrogate failed: ${output} ${errors}")

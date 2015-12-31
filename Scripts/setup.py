@@ -79,6 +79,12 @@ def run_cmake(config, args):
     else:
         optimize = args.optimize
 
+    # Verbose level
+    if "verbose_igate" in config:
+        cmake_args += ["-DIGATE_VERBOSE=" + str(config["verbose_igate"])]
+    else:
+        cmake_args += ["-DIGATE_VERBOSE=0"] 
+
     cmake_args += ["-DOPTIMIZE=" + str(optimize)]
 
     try_execute("cmake", join_abs(get_script_dir(), ".."), *cmake_args)

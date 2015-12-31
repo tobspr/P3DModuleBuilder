@@ -11,13 +11,14 @@ from os.path import join, isfile, isdir
 
 from common import *
 
-if len(sys.argv) != 2:
-    debug_out("Usage: python interrogate.py <module-name>")
+if len(sys.argv) != 3:
+    debug_out("Usage: python interrogate.py <module-name> <verbose-level>")
     sys.exit(1)
 
 
 # Parameters
 MODULE_NAME = sys.argv[1]
+VERBOSE_LVL = int(sys.argv[2]) # Assume the user did specify something valid
 
 def check_ignore(source):
     """ This function checks if a file is on the ignore list """
@@ -47,6 +48,12 @@ def interrogate():
 
     # Create the interrogate command
     cmd = [join(get_panda_bin_path(), 'interrogate')]
+
+    if VERBOSE_LVL == 1:
+        cmd += ["-v"]
+    elif VERBOSE_LVL == 2:
+        cmd += ["-vv"]
+
     cmd += ["-fnames", "-string", "-refcount", "-assert", "-python-native"]
     cmd += ["-S" + get_panda_include_path() + "/parser-inc"]
     cmd += ["-S" + get_panda_include_path() + "/"]
@@ -62,10 +69,10 @@ def interrogate():
     cmd += ["-module", MODULE_NAME]
     cmd += ["-library", MODULE_NAME]
 
+
     if PandaSystem.get_major_version() > 1 or PandaSystem.get_minor_version() > 9:
         # Add nomangle option, but only for recent builds
         cmd += ["-nomangle"]
-
 
     if PandaSystem.get_major_version() == 1 and PandaSystem.get_minor_version() < 10:
         # Old interrogate options cant handle volatile
@@ -92,7 +99,7 @@ def interrogate():
         cmd += ["-D" + define]
 
     cmd += all_sources
-    try_execute(*cmd)
+    try_execute(*cmd, verbose=VERBOSE_LVL != 0)
 
 
 def interrogate_module():
@@ -111,7 +118,7 @@ def interrogate_module():
     cmd += ["-oc", "InterrogateModule.cpp"] 
     cmd += ["Interrogate.in"]
 
-    try_execute(*cmd)
+    try_execute(*cmd, verbose=VERBOSE_LVL != 0)
 
 if __name__ == "__main__":
 
