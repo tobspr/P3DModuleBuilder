@@ -37,9 +37,9 @@ set(LIBRARIES "")
 
 # Windows - 32 and 64 bit
 if (WIN32)
-  
+
   set(PYTHONVER CACHE STRING "27")
-  
+
   # Find panda path
   execute_process(
     COMMAND "${PYTHON_EXECUTABLE}" "-B" "Scripts/common.py" "--print-sdk-path"
@@ -61,7 +61,7 @@ if (WIN32)
 
   # These vars are based on the WIN_PANDA_PATH and usually are correct
   set(PANDA_LIBRARY_DIRS "${WIN_PANDA_PATH}/lib/")
-  set(PANDA_INCLUDE_DIR "${WIN_PANDA_PATH}/include") 
+  set(PANDA_INCLUDE_DIR "${WIN_PANDA_PATH}/include")
 
   set(PYTHON_LIBRARIES "${WIN_PANDA_PATH}/python/libs/python${PYTHONVER}.lib")
   set(PYTHON_INCLUDE_DIRS "${WIN_PANDA_PATH}/python/include")
@@ -238,14 +238,14 @@ if (MSVC)
 
   # Warning level 3 should be enough
   add_definitions("/W3")
-  
+
   # Special case for 32 bit
   if(CMAKE_CL_32)
     add_definitions("/machine:x86")
   endif()
 
 ELSE()
-  
+
   # Assuming GCC here
 
   add_definitions("-ftemplate-depth-70 -fPIC -c")
