@@ -121,8 +121,8 @@ else()
   endif()
 
   # [LIB] Freetype
-  if(USE_LIB_FREETPYE)
-    find_package(freetype REQUIRED)
+  if(USE_LIB_FREETYPE)
+    find_package(Freetype REQUIRED)
     include_directories(${FREETYPE_INCLUDE_DIRS})
     set(${LIBRARIES} "${LIBRARIES};${FREETYPE_LIBRARIES}")
   endif()
