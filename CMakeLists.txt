@@ -316,7 +316,7 @@ target_link_libraries(${PROJECT_NAME} ${PYTHON_LIBRARIES} ${PANDA_LIBRARIES} ${L
 if(WIN32)
 #   # Eventually link core.pyd?
 else()
-  set(CMAKE_MODULE_LINKER_FLAGS ${CMAKE_MODULE_LINKER_FLAGS} "${PANDA_CORE_PATH}")
+  set(CMAKE_MODULE_LINKER_FLAGS ${PANDA_CORE_PATH})
 endif()
 
 # After building, copy the file to the current directory
