@@ -110,16 +110,13 @@ def is_64_bit():
     """ Returns whether the build system is 64 bit (=True) or 32 bit (=False) """
     return PandaSystem.get_platform() in ["win_amd64"]
 
-
 def is_windows():
     """ Returns whether the build system is windows """
     return platform.system().lower() == "windows"
 
-
 def is_linux():
     """ Returns wheter the build system is linux """
     return platform.system().lower() == "linux"
-
 
 def get_compiler_name():
     """ Returns the name of the used compiler, either 'MSC', 'GCC' or 'CLANG' """
@@ -127,17 +124,14 @@ def get_compiler_name():
     compiler_name = full_name.split()[0]
     return compiler_name.upper()
 
-
 def fatal_error(*args):
     """ Prints an error to stderr and then exits with a nonzero status code """
     print("\n\n[!] FATAL ERROR:", *args, file=stderr)
     exit(1)
 
-
 def debug_out(*args):
     """ Prints a debug output string """
     print(*args)
-
 
 def try_makedir(dirname):
     """ Tries to make the specified dir, but in case it fails it does nothing """
@@ -167,7 +161,6 @@ def try_execute(*args, **kwargs):
         debug_out(msg.output)
         fatal_error("Subprocess returned no-zero statuscode!")
 
-
 def join_abs(*args):
     """ Behaves like os.path.join, but replaces stuff like '/../' """
     joined = join(*args)
@@ -175,12 +168,10 @@ def join_abs(*args):
     fname.make_absolute()
     return fname.to_os_generic()
 
-
 def get_ini_conf(fname):
     """ Very simple .ini file reader, with no error checking """
     with open(fname, "r") as handle:
         return {i.split("=")[0].strip(): i.split("=")[-1].strip() for i in handle.readlines() if i.strip()}
-
 
 def write_ini_conf(config, fname):
     """ Very simple .ini file writer, with no error checking """
@@ -189,7 +180,7 @@ def write_ini_conf(config, fname):
 
 if __name__ == "__main__":
 
-    # Command line utiliies
+    # Command line scripts
 
     if len(argv) != 2:
         fatal_error("USAGE: ppython common.py <option>")
