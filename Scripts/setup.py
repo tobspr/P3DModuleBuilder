@@ -61,7 +61,7 @@ def run_cmake(config, args):
 
     if is_windows():
         cmake_args += ["-DPYTHONVER:STRING=" + pyver]
-    
+
     if is_linux():
         cmake_args += ["-DPYTHONVERDOT:STRING=" + pyver_dot]
 
@@ -83,7 +83,7 @@ def run_cmake(config, args):
     if "verbose_igate" in config:
         cmake_args += ["-DIGATE_VERBOSE=" + str(config["verbose_igate"])]
     else:
-        cmake_args += ["-DIGATE_VERBOSE=0"] 
+        cmake_args += ["-DIGATE_VERBOSE=0"]
 
     cmake_args += ["-DOPTIMIZE=" + str(optimize)]
 

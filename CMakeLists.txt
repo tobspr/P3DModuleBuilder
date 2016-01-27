@@ -169,6 +169,13 @@ else()
 
 endif()
 
+# Find core.so/core.pyd path
+execute_process(
+  COMMAND "${PYTHON_EXECUTABLE}" "-B" "Scripts/common.py" "--print-core-path"
+  OUTPUT_VARIABLE PANDA_CORE_PATH
+  WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR})
+
+
 # Link panda includes / libraries
 include_directories("${PANDA_INCLUDE_DIR}")
 include_directories("${PYTHON_INCLUDE_DIRS}")
@@ -244,7 +251,7 @@ if (MSVC)
     add_definitions("/machine:x86")
   endif()
 
-ELSE()
+else()
 
   # Assuming GCC here
 
@@ -278,7 +285,7 @@ ELSE()
     message(FATAL_ERROR "Invalid optimize value! Was: '${OPTIMIZE}'")
   endif()
 
-ENDIF()
+endif()
 
 # Define the module name
 add_definitions("/DPB_MODULE=${PROJECT_NAME}")
@@ -305,6 +312,12 @@ set_target_properties(${PROJECT_NAME} PROPERTIES PREFIX "")
 
 # Add the required libraries
 target_link_libraries(${PROJECT_NAME} ${PYTHON_LIBRARIES} ${PANDA_LIBRARIES} ${LIBRARIES})
+
+if(WIN32)
+#   # Eventually link core.pyd?
+else()
+  set(CMAKE_MODULE_LINKER_FLAGS ${CMAKE_MODULE_LINKER_FLAGS} "${PANDA_CORE_PATH}")
+endif()
 
 # After building, copy the file to the current directory
 add_custom_command(

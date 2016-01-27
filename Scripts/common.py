@@ -17,7 +17,7 @@ def get_output_name():
     """ Returns the name of the output dir, depending on the system architecture """
     return PandaSystem.getPlatform().lower() + "_py{}{}".format(
         sys.version_info.major, sys.version_info.minor)
-    
+
 
 def get_script_dir():
     """ Returns the name of the directory the scripts are located in """
@@ -48,6 +48,11 @@ def get_panda_sdk_path():
     fname.make_absolute()
     return fname.to_os_specific()
 
+def get_panda_core_lib_path():
+    """ Returns of the path of the core panda3d module, either core.pyd on windows
+    or core.so on linux. This is an absolute path """
+    import panda3d.core
+    return panda3d.core.__file__
 
 def get_panda_bin_path():
     """ Returns the path to the panda3d binaries """
@@ -179,7 +184,7 @@ def get_ini_conf(fname):
 
 def write_ini_conf(config, fname):
     """ Very simple .ini file writer, with no error checking """
-    with open(fname, "w") as handle: 
+    with open(fname, "w") as handle:
         handle.write(''.join("{}={}\n".format(k,v) for k,v in sorted(config.items())))
 
 if __name__ == "__main__":
@@ -191,6 +196,10 @@ if __name__ == "__main__":
 
     if "--print-sdk-path" in argv:
         stdout.write(get_panda_sdk_path())
+        exit(0)
+
+    elif "--print-core-path" in argv:
+        stdout.write(get_panda_core_lib_path())
         exit(0)
 
     elif "--print-paths" in argv:
