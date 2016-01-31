@@ -251,6 +251,9 @@ if (MSVC)
     add_definitions("/machine:x86")
   endif()
 
+  # Use multi-core compilation
+  add_definitions("/GM- /MP")
+
 else()
 
   # Assuming GCC here
