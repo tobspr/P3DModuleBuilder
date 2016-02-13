@@ -5,7 +5,7 @@ import os
 import argparse
 from os.path import join, realpath, dirname
 
-from Scripts.common import get_ini_conf, write_ini_conf
+from scripts.common import get_ini_conf, write_ini_conf
 
 if __name__ == "__main__":
 
@@ -35,7 +35,7 @@ if __name__ == "__main__":
 
 
     # Just execute the build script
-    from Scripts.setup import make_output_dir, run_cmake, run_cmake_build
+    from scripts.setup import make_output_dir, run_cmake, run_cmake_build
     make_output_dir(clean=args.clean)
     run_cmake(config, args)
     run_cmake_build(config, args)
