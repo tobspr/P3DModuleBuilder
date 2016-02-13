@@ -42,7 +42,7 @@ if (WIN32)
 
   # Find panda path
   execute_process(
-    COMMAND "${PYTHON_EXECUTABLE}" "-B" "Scripts/common.py" "--print-sdk-path"
+    COMMAND "${PYTHON_EXECUTABLE}" "-B" "scripts/common.py" "--print-sdk-path"
     OUTPUT_VARIABLE WIN_PANDA_PATH
     WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR})
 
@@ -148,7 +148,7 @@ else()
 
     # Find panda path
     execute_process(
-      COMMAND "${PYTHON_EXECUTABLE}" "-B" "Scripts/common.py" "--print-sdk-path"
+      COMMAND "${PYTHON_EXECUTABLE}" "-B" "scripts/common.py" "--print-sdk-path"
       OUTPUT_VARIABLE LOCAL_PANDA_PATH
       WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR})
 
@@ -171,7 +171,7 @@ endif()
 
 # Find core.so/core.pyd path
 execute_process(
-  COMMAND "${PYTHON_EXECUTABLE}" "-B" "Scripts/common.py" "--print-core-path"
+  COMMAND "${PYTHON_EXECUTABLE}" "-B" "scripts/common.py" "--print-core-path"
   OUTPUT_VARIABLE PANDA_CORE_PATH
   WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR})
 
@@ -182,7 +182,7 @@ include_directories("${PYTHON_INCLUDE_DIRS}")
 
 # Run interrogate over the files
 execute_process(
-    COMMAND "${PYTHON_EXECUTABLE}" "-B" "Scripts/interrogate.py" "${PROJECT_NAME}" "${IGATE_VERBOSE}"
+    COMMAND "${PYTHON_EXECUTABLE}" "-B" "scripts/interrogate.py" "${PROJECT_NAME}" "${IGATE_VERBOSE}"
     OUTPUT_VARIABLE output
     ERROR_VARIABLE errors
     RESULT_VARIABLE return_code
@@ -295,12 +295,12 @@ add_definitions("/DPB_MODULE=${PROJECT_NAME}")
 add_definitions("/DPB_CFG_MODULE=${PROJECT_NAME}")
 
 # Collect sources for compiling
-file(GLOB_RECURSE SOURCES Source/*.cpp Source/*.cxx)
-include_directories("Source/")
+file(GLOB_RECURSE SOURCES source/*.cpp source/*.cxx)
+include_directories("source/")
 set(SOURCES ${SOURCES_H} ${SOURCES})
 
 # Collect subdirs for compiling
-file(GLOB POSSIBLE_DIRS RELATIVE ${CMAKE_CURRENT_LIST_DIR} Source/*)
+file(GLOB POSSIBLE_DIRS RELATIVE ${CMAKE_CURRENT_LIST_DIR} source/*)
 foreach(PDIR ${POSSIBLE_DIRS})
   if (IS_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/${PDIR})
     include_directories("${PDIR}")

@@ -1,5 +1,5 @@
 
-""" 
+"""
 
 Runs the interrogate and interrogate_module commands from Panda3D.
 
@@ -22,7 +22,7 @@ VERBOSE_LVL = int(sys.argv[2]) # Assume the user did specify something valid
 
 def check_ignore(source):
     """ This function checks if a file is on the ignore list """
-    for f in ["InterrogateModule.cpp", "InterrogateWrapper.cpp"]:
+    for f in ["interrogate_module.cpp", "interrogate_wrapper.cpp"]:
         if f.lower() in source.lower():
             return False
     return True
@@ -64,11 +64,10 @@ def interrogate():
             cmd += ["-I" + pth]
 
     cmd += ["-srcdir", "."]
-    cmd += ["-oc", "InterrogateWrapper.cpp"]
-    cmd += ["-od", "Interrogate.in"]
+    cmd += ["-oc", "interrogate_wrapper.cpp"]
+    cmd += ["-od", "interrogate.in"]
     cmd += ["-module", MODULE_NAME]
     cmd += ["-library", MODULE_NAME]
-
 
     if PandaSystem.get_major_version() > 1 or PandaSystem.get_minor_version() > 9:
         # Add nomangle option, but only for recent builds
@@ -111,19 +110,19 @@ def interrogate_module():
 
     if PandaSystem.get_major_version() > 1 or PandaSystem.get_minor_version() > 9:
         # Older panda3d versions don't have this
-        cmd += ["-import", "panda3d.core"] 
+        cmd += ["-import", "panda3d.core"]
 
-    cmd += ["-module", MODULE_NAME] 
-    cmd += ["-library", MODULE_NAME] 
-    cmd += ["-oc", "InterrogateModule.cpp"] 
-    cmd += ["Interrogate.in"]
+    cmd += ["-module", MODULE_NAME]
+    cmd += ["-library", MODULE_NAME]
+    cmd += ["-oc", "interrogate_module.cpp"]
+    cmd += ["interrogate.in"]
 
     try_execute(*cmd, verbose=VERBOSE_LVL != 0)
 
 if __name__ == "__main__":
 
     # Change into the source directory
-    source_dir = join(get_script_dir(), "../Source/")
+    source_dir = join(get_script_dir(), "../source/")
     chdir(source_dir)
 
     interrogate()
