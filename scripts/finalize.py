@@ -6,9 +6,7 @@ import sys
 import platform
 from shutil import copyfile
 from os.path import isfile, join, dirname, realpath, isdir
-from panda3d.core import PandaSystem
 from common import *
-
 
 def find_binary():
     """ Returns the path to the generated binary and pdb file """
@@ -45,9 +43,7 @@ def find_binary():
 
     return source_file, pdb_file, target_file
 
-
 if __name__ == "__main__":
-
 
     if len(sys.argv) != 2:
         fatal_error("Usage: finalize.py <module-name>")
