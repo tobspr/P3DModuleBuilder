@@ -82,6 +82,20 @@ if (WIN32)
   # [LIB] Eigen 3
   if (USE_LIB_EIGEN)
     include_directories("${THIRDPARTY_DIR}/eigen/include")
+
+    # Eigen build flags (sync with Panda)
+    if (USE_LIB_EIGEN)
+      add_definitions("/DEIGEN_MPL2_ONLY=")
+      if ((OPTIMIZE STREQUAL "3") OR (OPTIMIZE STREQUAL "4"))
+        add_definitions("/DEIGEN_NO_DEBUG=")
+        if (MSVC)
+          # Squeeze out a bit more performance on MSVC builds...
+          # Only do this if EIGEN_NO_DEBUG is also set, otherwise it
+          # will turn them into runtime assertions.
+          add_definitions("/DEIGEN_NO_STATIC_ASSERT=")
+        endif()
+      endif()
+    endif()
   endif()
 
   # [LIB] Freetype
@@ -118,6 +132,14 @@ else()
   # [LIB] Eigen 3
   if (USE_LIB_EIGEN)
     include_directories(BEFORE "/usr/include/eigen3/")
+
+    # Eigen build flags (sync with Panda)
+    if (USE_LIB_EIGEN)
+      add_definitions("/DEIGEN_MPL2_ONLY=")
+      if ((OPTIMIZE STREQUAL "3") OR (OPTIMIZE STREQUAL "4"))
+        add_definitions("/DEIGEN_NO_DEBUG=")
+      endif()
+    endif()
   endif()
 
   # [LIB] Freetype
@@ -266,7 +288,7 @@ else()
   endif()
 
   add_definitions("-pthread")
-  add_definitions("-mtune=native -march=native -std=c++11")
+  add_definitions("-std=c++11")
 
   # No exceptions
   add_definitions("-fno-exceptions")
