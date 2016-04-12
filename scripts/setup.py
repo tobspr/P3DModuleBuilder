@@ -96,8 +96,8 @@ def run_cmake_build(config, args):
     if config["generate_pdb"].lower() in ["1", "true", "yes", "y"]:
         configuration = "RelWithDebInfo"
 
-    # get number of cores
-    num_cores = multiprocessing.cpu_count()
+    # get number of cores, leave one for the system though
+    num_cores = max(1, multiprocessing.cpu_count() - 1)
 
     core_option = ""
     if is_linux():
