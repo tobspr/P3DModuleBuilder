@@ -5,6 +5,9 @@ import os
 import argparse
 from os.path import join, realpath, dirname
 
+# Change into the current directory
+os.chdir(dirname(realpath(__file__)))
+
 from scripts.common import get_ini_conf, write_ini_conf
 
 if __name__ == "__main__":
