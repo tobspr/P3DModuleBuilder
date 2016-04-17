@@ -1,5 +1,8 @@
 #!/usr/bin/python
 
+# Important: import panda3d as the very first library - otherwise it crashes
+import panda3d.core
+
 import sys
 import os
 import argparse
