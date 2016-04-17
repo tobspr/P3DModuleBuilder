@@ -1,6 +1,6 @@
-from __future__ import print_function
 
-# This script just copies the generated .pyd file to the current directory.
+# Important: import panda3d as the very first library - otherwise it crashes
+import panda3d.core
 
 import sys
 import platform
