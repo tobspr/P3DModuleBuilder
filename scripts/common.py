@@ -155,10 +155,10 @@ def try_execute(*args, **kwargs):
         else:
             output = subprocess.check_output(args, bufsize=1, stderr=subprocess.STDOUT)
             debug_out("Process output: ")
-            debug_out(output)
+            debug_out(output.decode("utf-8", errors="ignore"))
     except subprocess.CalledProcessError as msg:
         debug_out("Process error:")
-        debug_out(msg.output)
+        debug_out(msg.output.decode("utf-8", errors="ignore"))
         fatal_error("Subprocess returned no-zero statuscode!")
 
 def join_abs(*args):
