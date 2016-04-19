@@ -4,7 +4,7 @@ Common functions for the build system
 
 """
 from __future__ import print_function
-
+import locale
 import sys
 import subprocess
 import platform
@@ -155,10 +155,10 @@ def try_execute(*args, **kwargs):
         else:
             output = subprocess.check_output(args, bufsize=1, stderr=subprocess.STDOUT)
             debug_out("Process output: ")
-            debug_out(output.decode("chcp", errors="ignore"))
+            debug_out(output.decode(locale.getpreferredencoding(), errors="ignore"))
     except subprocess.CalledProcessError as msg:
         debug_out("Process error:")
-        debug_out(msg.output.decode("chcp", errors="ignore"))
+        debug_out(msg.output.decode(locale.getpreferredencoding(), errors="ignore"))
         fatal_error("Subprocess returned no-zero statuscode!")
 
 def join_abs(*args):
