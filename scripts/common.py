@@ -126,12 +126,12 @@ def get_compiler_name():
 
 def fatal_error(*args):
     """ Prints an error to stderr and then exits with a nonzero status code """
-    print("\n\n[!] FATAL ERROR:", *args, file=stderr)
+    print("\n\n[!] FATAL ERROR:", *[i.encode('ascii', 'ignore') for i in args], file=stderr)
     exit(1)
 
 def debug_out(*args):
     """ Prints a debug output string """
-    print(*args)
+    print(*[i.encode('ascii', 'ignore') for i in args])
 
 def try_makedir(dirname):
     """ Tries to make the specified dir, but in case it fails it does nothing """
