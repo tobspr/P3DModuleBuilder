@@ -1,24 +1,20 @@
 
 # Important: import panda3d as the very first library - otherwise it crashes
-import panda3d.core
+import panda3d.core  # noqa
 
 import sys
-import platform
+
 from shutil import copyfile
-from os.path import isfile, join, dirname, realpath, isdir
-from common import *
+from os.path import isfile, join
+from common import is_windows, is_linux, get_output_dir, fatal_error, get_script_dir
+
 
 def find_binary():
     """ Returns the path to the generated binary and pdb file """
 
-    # Stores where we find the generated binary
     source_file = None
-
-    # Stores where we find the generated PDB
     pdb_file = None
-
     possible_files = []
-    possible_pdb_files = []
 
     if is_windows():
 

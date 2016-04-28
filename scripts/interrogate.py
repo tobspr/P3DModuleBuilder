@@ -9,7 +9,9 @@ import sys
 from os import listdir, chdir
 from os.path import join, isfile, isdir
 
-from common import *
+from panda3d.core import PandaSystem
+from common import debug_out, get_panda_bin_path, get_panda_include_path
+from common import get_compiler_name, is_64_bit, try_execute, join_abs, get_script_dir
 
 if len(sys.argv) != 3:
     debug_out("Usage: python interrogate.py <module-name> <verbose-level>")
@@ -18,7 +20,8 @@ if len(sys.argv) != 3:
 
 # Parameters
 MODULE_NAME = sys.argv[1]
-VERBOSE_LVL = int(sys.argv[2]) # Assume the user did specify something valid
+VERBOSE_LVL = int(sys.argv[2])  # Assume the user did specify something valid
+
 
 def check_ignore(source):
     """ This function checks if a file is on the ignore list """
@@ -26,6 +29,7 @@ def check_ignore(source):
         if f.lower() in source.lower():
             return False
     return True
+
 
 def find_sources(base_dir):
     """ Collects all header files recursively """
@@ -85,7 +89,8 @@ def interrogate():
         if is_64_bit():
             defines += ["WIN64_VC", "WIN64", "_WIN64"]
         # NOTE: this 1600 value is the version number for VC2010.
-        defines += ["_MSC_VER=1600", '"__declspec(param)="', "__cdecl", "_near", "_far", "__near", "__far", "__stdcall"]
+        defines += ["_MSC_VER=1600", '"__declspec(param)="', "__cdecl", "_near",
+                    "_far", "__near", "__far", "__stdcall"]
 
     if get_compiler_name() == "GCC":
         defines += ['__attribute__\(x\)=']

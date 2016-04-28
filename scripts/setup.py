@@ -3,10 +3,12 @@ import shutil
 import sys
 import multiprocessing
 from os import chdir
-from os.path import join, isdir
+from os.path import isdir, isfile
 from panda3d.core import PandaSystem
 
-from .common import *
+from .common import get_output_dir, try_makedir, fatal_error, is_windows
+from .common import is_linux, join_abs, get_panda_lib_path, is_64_bit
+from .common import try_execute, get_script_dir
 
 
 def make_output_dir(clean=False):
@@ -54,7 +56,6 @@ def run_cmake(config, args):
         bit_suffix = " Win64" if is_64_bit() else ""
         cmake_args += ["-G" + config["vc_version"] + bit_suffix]
 
-
     # Specify python version, once as integer, once seperated by a dot
     pyver = "{}{}".format(sys.version_info.major, sys.version_info.minor)
     pyver_dot = "{}.{}".format(sys.version_info.major, sys.version_info.minor)
@@ -89,6 +90,7 @@ def run_cmake(config, args):
 
     try_execute("cmake", join_abs(get_script_dir(), ".."), *cmake_args)
 
+
 def run_cmake_build(config, args):
     """ Runs the cmake build which builds the final output """
 
@@ -107,6 +109,4 @@ def run_cmake_build(config, args):
         # Specifying no cpu count makes MSBuild use all available ones
         core_option = "/m"
 
-
     try_execute("cmake", "--build", ".", "--config", configuration, "--", core_option)
-
