@@ -139,8 +139,10 @@ def fatal_error(*args):
 
 def debug_out(*args):
     """ Prints a debug output string """
-    print(*[i.encode('ascii', 'ignore') for i in args])
-
+    if sys.version_info.major >= 3:
+        print(*[str(i) for i in args])
+    else:
+        print(*[i.encode('ascii', 'ignore') for i in args])
 
 def try_makedir(dirname):
     """ Tries to make the specified dir, but in case it fails it does nothing """

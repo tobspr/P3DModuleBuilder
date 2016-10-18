@@ -280,7 +280,9 @@ if (MSVC)
   endif()
 
   # Use multi-core compilation
-  add_definitions("/GM- /MP")
+  add_definitions("/MP")
+  # add_definitions("/GM-")
+
 
 else()
 
