@@ -32,6 +32,14 @@ set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "")
 set(CMAKE_CXX_FLAGS_RELEASE "")
 set(CMAKE_CXX_FLAGS_MINSIZEREL "")
 
+set(IS_64_BIT (CMAKE_CL_64 STREQUAL "1"))
+set(IS_32_BIT (NOT IS_64_BIT))
+
+if(IS_64_BIT)
+  message(STATUS "Bitness: 64 bit")
+else()
+  message(STATUS "Bitness: 32 bit")
+endif()
 
 set(LIBRARIES "")
 
@@ -50,7 +58,7 @@ if (WIN32)
 
   # Determine bitness
   set(THIRDPARTY_SUFFIX "-x64")
-  if (CMAKE_CL_32)
+  if (IS_32_BIT)
     set(THIRDPARTY_SUFFIX "")
   endif()
 
@@ -256,7 +264,7 @@ if (MSVC)
 
   # This matches the makepanda options
 
-  if (CMAKE_CL_64)
+  if (IS_64_BIT)
     add_definitions("/favor:blend /DWIN64_VC /DWIN64 /bigobj")
   endif()
 
@@ -270,7 +278,7 @@ if (MSVC)
     # add_definitions("/DWINVER=0x501")
   endif()
 
-  if(CMAKE_CL_32 AND ENABLE_SSE2)
+  if(IS_32_BIT AND ENABLE_SSE2)
     # If SSE is enabled
     add_definitions("/arch:SSE2")
   endif()
@@ -301,7 +309,7 @@ if (MSVC)
   add_definitions("/W3")
 
   # Special case for 32 bit
-  if(CMAKE_CL_32)
+  if(IS_32_BIT)
     add_definitions("/machine:x86")
   endif()
 
