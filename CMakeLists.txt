@@ -45,38 +45,65 @@ if (WIN32)
     COMMAND "${PYTHON_EXECUTABLE}" "-B" "scripts/common.py" "--print-sdk-path"
     OUTPUT_VARIABLE WIN_PANDA_PATH
     WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR})
+  message(STATUS "Detected panda3d installation: ${WIN_PANDA_PATH}")
 
-  # Find thirdparty directory
+
+  # Determine bitness
+  set(THIRDPARTY_SUFFIX "-x64")
   if (CMAKE_CL_32)
-    set(THIRDPARTY_DIR "${WIN_PANDA_PATH}/../thirdparty/win-libs-vc10")
-    if (NOT (EXISTS "${THIRDPARTY_DIR}"))
-      set(THIRDPARTY_DIR "${WIN_PANDA_PATH}/thirdparty/win-libs-vc10")
-    endif()
-  else()
-    set (THIRDPARTY_DIR "${WIN_PANDA_PATH}/../thirdparty/win-libs-vc10-x64")
-    if (NOT (EXISTS "${THIRDPARTY_DIR}"))
-      set (THIRDPARTY_DIR "${WIN_PANDA_PATH}/thirdparty/win-libs-vc10-x64")
-    endif()
+    set(THIRDPARTY_SUFFIX "")
   endif()
 
-  # These vars are based on the WIN_PANDA_PATH and usually are correct
-  set(PANDA_LIBRARY_DIRS "${WIN_PANDA_PATH}/lib/")
+
+  # Find visual studio version
+  if (MSVC10)
+    set(MSVC_VERSION_SHORT "vc10")
+  elseif (MSVC12)
+    set(MSVC_VERSION_SHORT "vc12")
+  elseif(MSVC14)
+    set(MSVC_VERSION_SHORT "vc14")
+  else()
+    message(WARMING "Unable to determine visual studio version, assuming Visual Studio 2010")
+    set(MSVC_VERSION_SHORT "vc10")
+  endif()
+  message(STATUS "Detected visual studio version: ${MSVC_VERSION_SHORT}")
+
+
+  # Find thirdparty directory
+  set(THIRDPARTY_DIR "${WIN_PANDA_PATH}/../thirdparty/win-libs-${MSVC_VERSION_SHORT}${THIRDPARTY_SUFFIX}")
+  if (NOT (EXISTS "${THIRDPARTY_DIR}"))
+    set(THIRDPARTY_DIR "${WIN_PANDA_PATH}/thirdparty/win-libs-${MSVC_VERSION_SHORT}${THIRDPARTY_SUFFIX}")
+  endif()
+
+  if (NOT (EXISTS "${THIRDPARTY_DIR}"))
+    message(WARNING "Unable to find thirdparty directory! Expected it at: ${THIRDPARTY_DIR}")
+  else()
+    message(STATUS "Detected thirdparty directory: ${THIRDPARTY_DIR}")
+  endif()
+
+
+  # Find lib and include directory
+  set(PANDA_LIBRARY_DIRS "${WIN_PANDA_PATH}/lib")
   set(PANDA_INCLUDE_DIR "${WIN_PANDA_PATH}/include")
+
+  if (NOT (EXISTS "${PANDA_LIBRARY_DIRS}"))
+    message(WARNING "Panda3D library directory does not exist! Expected it at: ${PANDA_LIBRARY_DIRS}")
+  endif()
 
   set(PYTHON_LIBRARIES "${WIN_PANDA_PATH}/python/libs/python${PYTHONVER}.lib")
   set(PYTHON_INCLUDE_DIRS "${WIN_PANDA_PATH}/python/include")
 
   # [LIB] Bullet
   if(USE_LIB_BULLET)
+
+    if (NOT (EXISTS "${PANDA_INCLUDE_DIR}/bullet_includes.h"))
+      message(FATAL_ERROR "This module requires the bullet library, but your Panda3D Build was copmiled without bullet support! Use --use-bullet when compiling.")
+    endif()
+
     include_directories("${THIRDPARTY_DIR}/bullet/include/")
     link_directories("${THIRDPARTY_DIR}/bullet/lib/")
 
-    # TODO: Might need more libs
-    if(CMAKE_CL_32)
-      set(LIBRARIES "${LIBRARIES};LinearMath;BulletCollision;BulletDynamics;BulletSoftBody")
-    else()
-      set(LIBRARIES "${LIBRARIES};LinearMath_x64;BulletCollision_x64;BulletDynamics_x64;BulletSoftBody_x64")
-    endif()
+    set(LIBRARIES "${LIBRARIES};LinearMath;BulletCollision;BulletDynamics;BulletSoftBody")
   endif()
 
   # [LIB] Eigen 3
@@ -101,6 +128,7 @@ if (WIN32)
   # [LIB] Freetype
   if (USE_LIB_FREETYPE)
     include_directories("${THIRDPARTY_DIR}/freetype/include")
+    include_directories("${THIRDPARTY_DIR}/freetype/include/freetype2")
     link_directories("${THIRDPARTY_DIR}/freetype/lib")
     set(LIBRARIES "${LIBRARIES};freetype")
   endif()
@@ -156,7 +184,6 @@ else()
   find_path(PANDA_INCLUDE_DIR dtoolbase.h PATH_SUFFIXES panda3d)
 
   # Locate the Panda3D libraries
-
   set(REQ_LIBRARIES p3framework panda pandaexpress p3dtool p3dtoolconfig p3direct ${INTERROGATE_LIB})
   if(USE_LIB_BULLET)
     set(REQ_LIBRARIES pandabullet ${REQ_LIBRARIES})
@@ -191,7 +218,6 @@ else()
       find_library(PANDA_LIBRARY_${lib} ${lib} PATHS "${LOCAL_PANDA_PATH}/lib/")
       set(PANDA_LIBRARIES "${PANDA_LIBRARIES};${PANDA_LIBRARY_${lib}}")
     endforeach()
-
 
   endif()
 
