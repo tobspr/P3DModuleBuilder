@@ -32,13 +32,15 @@ set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "")
 set(CMAKE_CXX_FLAGS_RELEASE "")
 set(CMAKE_CXX_FLAGS_MINSIZEREL "")
 
-set(IS_64_BIT (CMAKE_CL_64 STREQUAL "1"))
-set(IS_32_BIT (NOT IS_64_BIT))
 
-if(IS_64_BIT)
-  message(STATUS "Bitness: 64 bit")
+if (CMAKE_CL_64 STREQUAL "1")
+  message(STATUS "Bitness: 64 bit ('${CMAKE_CL_64}')")
+  set(IS_64_BIT TRUE)
+  set(IS_32_BIT FALSE)
 else()
-  message(STATUS "Bitness: 32 bit")
+  message(STATUS "Bitness: 32 bit ('${CMAKE_CL_64}')")
+  set(IS_64_BIT TRUE)
+  set(IS_32_BIT FALSE)
 endif()
 
 set(LIBRARIES "")
@@ -61,6 +63,7 @@ if (WIN32)
   if (IS_32_BIT)
     set(THIRDPARTY_SUFFIX "")
   endif()
+
 
 
   # Find visual studio version
