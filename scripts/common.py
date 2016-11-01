@@ -140,7 +140,13 @@ def fatal_error(*args):
 def debug_out(*args):
     """ Prints a debug output string """
     if sys.version_info.major >= 3:
-        print(*[str(i) for i in args])
+        def decode_str(s):
+            if isinstance(s, str):
+                return s.encode("ascii", "ignore").decode("ascii", "ignore")
+            else:
+                return str(s)
+
+        print(*[decode_str(i) for i in args])
     else:
         print(*[i.encode('ascii', 'ignore') for i in args])
 
