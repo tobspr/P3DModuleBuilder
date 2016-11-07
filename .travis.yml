@@ -17,4 +17,5 @@ script:
     - export PYTHONPATH=${PYTHONPATH}:/usr/share/panda3d
     - echo -e "\nmodule_name=CI_TEST\n" >> config.ini
     - python2.7 build.py
+    - python2.7 -c "import panda3d; import CI_TEST; print(dir(CI_TEST))"
 
