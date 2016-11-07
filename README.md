@@ -1,3 +1,4 @@
+[![Build Status](https://travis-ci.org/tobspr/P3DModuleBuilder.svg?branch=master)](https://travis-ci.org/tobspr/P3DModuleBuilder)
 
 # Panda3D Module Builder
 
