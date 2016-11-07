@@ -165,16 +165,15 @@ def try_execute(*args, **kwargs):
     status code """
     debug_out("Executing command: ", ' '.join(args), "\n")
     try:
-        if "verbose" in kwargs and kwargs["verbose"]:
-            process = subprocess.Popen(args)
-            process.communicate()
-            if process.returncode != 0:
-                raise Exception("Return-Code: " + str(process.returncode))
+        process = subprocess.Popen(args, shell=False, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+        line = process.stdout.readline()
+        while line:
+            debug_out(line.decode(locale.getpreferredencoding(), errors="ignore").rstrip("\r\n"))
+            line = process.stdout.readline()
+        process.wait()
+        if process.returncode != 0:
+            raise Exception("Process had non-zero returncode:", process.returncode)
 
-        else:
-            output = subprocess.check_output(args, bufsize=1, stderr=subprocess.STDOUT)
-            debug_out("Process output: ")
-            debug_out(output.decode(locale.getpreferredencoding(), errors="ignore"))
     except subprocess.CalledProcessError as msg:
         debug_out("Process error:")
         debug_out(msg.output.decode(locale.getpreferredencoding(), errors="ignore"))
