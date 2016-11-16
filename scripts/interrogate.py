@@ -38,6 +38,8 @@ def find_sources(base_dir):
     for f in files:
         fpath = join(base_dir, f)
         if isfile(fpath) and check_ignore(f) and f.endswith(".h"):
+            if f.endswith(".pb.h"):
+                continue # Skip protobuf
             sources.append(fpath)
         elif isdir(fpath):
             sources += find_sources(fpath)

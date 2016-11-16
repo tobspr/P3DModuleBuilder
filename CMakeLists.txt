@@ -362,7 +362,7 @@ add_definitions("/DPB_MODULE=${PROJECT_NAME}")
 add_definitions("/DPB_CFG_MODULE=${PROJECT_NAME}")
 
 # Collect sources for compiling
-file(GLOB_RECURSE SOURCES source/*.cpp source/*.cxx source/*.I source/*.hpp source/*.h)
+file(GLOB_RECURSE SOURCES source/*.cpp source/*.cxx source/*.I source/*.hpp source/*.h source/*.cc source/*.c)
 include_directories("source/")
 set(SOURCES ${SOURCES_H} ${SOURCES})
 
@@ -371,8 +371,20 @@ file(GLOB POSSIBLE_DIRS RELATIVE ${CMAKE_CURRENT_LIST_DIR} source/*)
 foreach(PDIR ${POSSIBLE_DIRS})
   if (IS_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/${PDIR})
     include_directories("${PDIR}")
+    file(GLOB POSSIBLE_SUB_DIRS RELATIVE ${CMAKE_CURRENT_LIST_DIR}/${PDIR} ${PDIR}/*)
+    foreach(PSUBDIR ${POSSIBLE_SUB_DIRS})
+      if (IS_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/${PDIR}/${PSUBDIR})
+        include_directories("${PDIR}/${PSUBDIR}")
+      endif()
+    endforeach()
   endif()
 endforeach()
+
+
+if ((EXISTS "${CMAKE_CURRENT_LIST_DIR}/additional_libs.cmake"))
+  include("${CMAKE_CURRENT_LIST_DIR}/additional_libs.cmake")
+endif()
+
 
 # Build library
 add_library(${PROJECT_NAME} MODULE ${SOURCES})
