@@ -166,7 +166,7 @@ def decode_str(s):
         else:
             return str(s)
     else:
-        return str.encode("ascii", "ignore")
+        return s.encode("ascii", "ignore")
 
 
 def fatal_error(*args):
