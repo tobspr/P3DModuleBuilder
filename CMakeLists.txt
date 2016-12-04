@@ -8,9 +8,9 @@ project (${PROJECT_NAME})
 set(CMAKE_BUILD_TYPE "Release")
 
 # Libraries and options set by the module builder
-set(USE_LIB_EIGEN CACHE BOOL TRUE)
-set(USE_LIB_BULLET CACHE BOOL FALSE)
-set(USE_LIB_FREETYPE CACHE BOOL FALSE)
+set(HAVE_LIB_EIGEN CACHE BOOL TRUE)
+set(HAVE_LIB_BULLET CACHE BOOL FALSE)
+set(HAVE_LIB_FREETYPE CACHE BOOL FALSE)
 set(OPTIMIZE CACHE STRING "3")
 set(IGATE_VERBOSE CACHE STRING "0")
 set(INTERROGATE_LIB CACHE STRING "p3interrogatedb")
@@ -105,7 +105,7 @@ if (WIN32)
   set(PYTHON_INCLUDE_DIRS "${WIN_PANDA_PATH}/python/include")
 
   # [LIB] Bullet
-  if(USE_LIB_BULLET)
+  if(HAVE_LIB_BULLET)
 
     if (NOT (EXISTS "${PANDA_INCLUDE_DIR}/bullet_includes.h"))
       message(FATAL_ERROR "This module requires the bullet library, but your Panda3D Build was copmiled without bullet support! Use --use-bullet when compiling.")
@@ -118,11 +118,11 @@ if (WIN32)
   endif()
 
   # [LIB] Eigen 3
-  if (USE_LIB_EIGEN)
+  if (HAVE_LIB_EIGEN)
     include_directories("${THIRDPARTY_DIR}/eigen/include")
 
     # Eigen build flags (sync with Panda)
-    if (USE_LIB_EIGEN)
+    if (HAVE_LIB_EIGEN)
       add_definitions("/DEIGEN_MPL2_ONLY=")
       if ((OPTIMIZE STREQUAL "3") OR (OPTIMIZE STREQUAL "4"))
         add_definitions("/DEIGEN_NO_DEBUG=")
@@ -137,7 +137,7 @@ if (WIN32)
   endif()
 
   # [LIB] Freetype
-  if (USE_LIB_FREETYPE)
+  if (HAVE_LIB_FREETYPE)
     include_directories("${THIRDPARTY_DIR}/freetype/include")
     include_directories("${THIRDPARTY_DIR}/freetype/include/freetype2")
     link_directories("${THIRDPARTY_DIR}/freetype/lib")
@@ -154,7 +154,7 @@ if (WIN32)
 
   # Link panda libraries
   set(PANDA_LIBRARIES "libp3framework;libpanda;libpandaexpress;libp3dtool;libp3dtoolconfig;libp3direct;${INTERROGATE_LIB}")
-  if(USE_LIB_BULLET)
+  if(HAVE_LIB_BULLET)
     set(PANDA_LIBRARIES "libpandabullet;${PANDA_LIBRARIES}")
   endif()
   link_directories("${PANDA_LIBRARY_DIRS}")
@@ -165,18 +165,18 @@ else()
   find_package(PythonLibs REQUIRED)
 
   # [LIB] Bullet
-  if (USE_LIB_BULLET)
+  if (HAVE_LIB_BULLET)
     find_package(Bullet REQUIRED)
     include_directories(${BULLET_INCLUDE_DIRS})
     set(LIBRARIES "${LIBRARIES};${BULLET_LIBRARIES}")
   endif()
 
   # [LIB] Eigen 3
-  if (USE_LIB_EIGEN)
+  if (HAVE_LIB_EIGEN)
     include_directories(BEFORE "/usr/include/eigen3/")
 
     # Eigen build flags (sync with Panda)
-    if (USE_LIB_EIGEN)
+    if (HAVE_LIB_EIGEN)
       add_definitions("/DEIGEN_MPL2_ONLY=")
       if ((OPTIMIZE STREQUAL "3") OR (OPTIMIZE STREQUAL "4"))
         add_definitions("/DEIGEN_NO_DEBUG=")
@@ -185,7 +185,7 @@ else()
   endif()
 
   # [LIB] Freetype
-  if(USE_LIB_FREETYPE)
+  if(HAVE_LIB_FREETYPE)
     find_package(Freetype REQUIRED)
     include_directories(${FREETYPE_INCLUDE_DIRS})
     set(LIBRARIES "${LIBRARIES};${FREETYPE_LIBRARIES}")
@@ -196,7 +196,7 @@ else()
 
   # Locate the Panda3D libraries
   set(REQ_LIBRARIES p3framework panda pandaexpress p3dtool p3dtoolconfig p3direct ${INTERROGATE_LIB})
-  if(USE_LIB_BULLET)
+  if(HAVE_LIB_BULLET)
     set(REQ_LIBRARIES pandabullet ${REQ_LIBRARIES})
   endif()
 

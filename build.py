@@ -12,6 +12,7 @@ from os.path import join, realpath, dirname
 os.chdir(dirname(realpath(__file__)))
 
 from scripts.common import get_ini_conf, write_ini_conf  # noqa
+from scripts.setup import make_output_dir, run_cmake, run_cmake_build
 
 if __name__ == "__main__":
 
@@ -36,11 +37,16 @@ if __name__ == "__main__":
         module_name = str(raw_input("Enter a module name: "))
         config["module_name"] = module_name.strip()
 
+    # Check for outdated parameters
+    for outdated_param in ["vc_version", "use_lib_eigen", "use_lib_bullet", "use_lib_freetype"]:
+        if outdated_param in config:
+            print("WARNING: Removing obsolete parameter '" + outdated_param + "', is now auto-detected.")
+            del config[outdated_param]
+
     # Write back config
     write_ini_conf(config, config_file)
 
     # Just execute the build script
-    from scripts.setup import make_output_dir, run_cmake, run_cmake_build
     make_output_dir(clean=args.clean)
     run_cmake(config, args)
     run_cmake_build(config, args)

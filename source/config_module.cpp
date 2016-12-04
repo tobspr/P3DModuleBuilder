@@ -10,11 +10,10 @@ Include all your dynamically typed classes here, e.g.
 
 #include "dconfig.h"
 
+Configure(config_mymodule);
+NotifyCategoryDef(mymodule , "");
 
-Configure( config_mymodule );
-NotifyCategoryDef( mymodule , "");
-
-ConfigureFn( config_mymodule ) {
+ConfigureFn(config_mymodule) {
   init_libmymodule();
 }
 

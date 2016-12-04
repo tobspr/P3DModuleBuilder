@@ -8,7 +8,8 @@ from panda3d.core import PandaSystem
 
 from .common import get_output_dir, try_makedir, fatal_error, is_windows
 from .common import is_linux, join_abs, get_panda_lib_path, is_64_bit
-from .common import try_execute, get_script_dir
+from .common import try_execute, get_script_dir, get_panda_mscv_version
+from .common import have_eigen, have_bullet, have_freetype
 
 
 def make_output_dir(clean=False):
@@ -54,7 +55,7 @@ def run_cmake(config, args):
     if is_windows():
         # Specify 64-bit compiler when using a 64 bit panda sdk build
         bit_suffix = " Win64" if is_64_bit() else ""
-        cmake_args += ["-G" + config["vc_version"] + bit_suffix]
+        cmake_args += ["-G" + get_panda_mscv_version().cmake_str + bit_suffix]
 
     # Specify python version, once as integer, once seperated by a dot
     pyver = "{}{}".format(sys.version_info.major, sys.version_info.minor)
@@ -67,12 +68,30 @@ def run_cmake(config, args):
         cmake_args += ["-DPYTHONVERDOT:STRING=" + pyver_dot]
 
     # Libraries
-    for lib in ["freetype", "bullet", "eigen"]:
-        if "use_lib_" + lib in config and config["use_lib_" + lib] in ["1", "yes", "y"]:
-            cmake_args += ["-DUSE_LIB_" + lib.upper() + "=TRUE"]
+    def is_required(lib):
+        if "require_lib_" + lib in config and config["require_lib_" + lib] in ["1", "yes", "y"]:
+            return True
+        return False
+
+    if is_required("eigen") and not have_eigen():
+        fatal_error("Your Panda3D build was not compiled with eigen support, but it is required!")
+        
+    if is_required("bullet") and not have_bullet():
+        fatal_error("Your Panda3D build was not compiled with bullet support, but it is required!")
+
+    if is_required("freetype") and not have_freetype():
+        fatal_error("Your Panda3D build was not compiled with freetype support, but it is required!")
+
+    if have_eigen():
+        cmake_args += ["-DHAVE_LIB_EIGEN=TRUE"]
+    if have_bullet():
+        cmake_args += ["-DHAVE_LIB_BULLET=TRUE"]
+    if have_freetype():
+        cmake_args += ["-DHAVE_LIB_FREETYPE=TRUE"]
 
     # Optimization level
     optimize = 3
+
     if args.optimize is None:
         # No optimization level set. Try to find it in the config
         if "optimize" in config:

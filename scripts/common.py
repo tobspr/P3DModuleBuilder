@@ -3,21 +3,50 @@
 Common functions for the build system
 
 """
+
 from __future__ import print_function
+
 import locale
 import sys
 import subprocess
 import platform
+
 from os.path import dirname, realpath, join, isdir, isfile
 from os import makedirs
 from sys import argv, stdout, stderr, exit
 from panda3d.core import PandaSystem, Filename, ExecutionEnvironment
 
 
+class MSVCVersion(object):
+    def __init__(self, msc_ver, cmake_str, suffix):
+        self.version = msc_ver
+        self.cmake_str = cmake_str
+        self.suffix = suffix
+
+    @property
+    def compiler_search_string(self):
+        return "MSC v." + str(self.version)
+
+MSVC_VERSIONS = [
+    MSVCVersion(1400, "Visual Studio 8 2005",  "vc80"),
+    MSVCVersion(1500, "Visual Studio 9 2008",  "vc90"),
+    MSVCVersion(1600, "Visual Studio 10 2010", "vc100"),
+    MSVCVersion(1700, "Visual Studio 11 2012", "vc110"),
+    MSVCVersion(1800, "Visual Studio 12 2013", "vc120"),
+    MSVCVersion(1900, "Visual Studio 14 2015", "vc140")
+]
+
 def get_output_name():
     """ Returns the name of the output dir, depending on the system architecture """
-    return PandaSystem.getPlatform().lower() + "_py{}{}".format(
-        sys.version_info.major, sys.version_info.minor)
+    compiler_suffix = ""
+    if is_windows():
+        compiler_suffix = "_" + get_panda_mscv_version().suffix
+
+    version_suffix = "panda" + PandaSystem.get_version_string()
+
+    return PandaSystem.getPlatform().lower() + "_{}_py{}{}{}".format(
+        version_suffix, sys.version_info.major,
+        sys.version_info.minor, compiler_suffix)
 
 
 def get_script_dir():
@@ -130,25 +159,26 @@ def get_compiler_name():
     compiler_name = full_name.split()[0]
     return compiler_name.upper()
 
+def decode_str(s):
+    if sys.version_info.major >= 3:
+        if isinstance(s, str):
+            return s.encode("ascii", "ignore").decode("ascii", "ignore")
+        else:
+            return str(s)
+    else:
+        return str.encode("ascii", "ignore")
+
 
 def fatal_error(*args):
     """ Prints an error to stderr and then exits with a nonzero status code """
-    print("\n\n[!] FATAL ERROR:", *[i.encode('ascii', 'ignore') for i in args], file=stderr)
+
+    print("\n\n[!] FATAL ERROR:", *[decode_str(i) for i in args], file=stderr)
     exit(1)
 
 
 def debug_out(*args):
     """ Prints a debug output string """
-    if sys.version_info.major >= 3:
-        def decode_str(s):
-            if isinstance(s, str):
-                return s.encode("ascii", "ignore").decode("ascii", "ignore")
-            else:
-                return str(s)
-
-        print(*[decode_str(i) for i in args])
-    else:
-        print(*[i.encode('ascii', 'ignore') for i in args])
+    print(*[decode_str(i) for i in args])
 
 def try_makedir(dirname):
     """ Tries to make the specified dir, but in case it fails it does nothing """
@@ -198,6 +228,40 @@ def write_ini_conf(config, fname):
     """ Very simple .ini file writer, with no error checking """
     with open(fname, "w") as handle:
         handle.write(''.join("{}={}\n".format(k, v) for k, v in sorted(config.items())))
+
+def get_panda_mscv_version():
+    """ Returns the MSVC version panda was built with """
+    compiler = PandaSystem.get_compiler()
+    for msvc_version in MSVC_VERSIONS:
+        if msvc_version.compiler_search_string in compiler:
+            return msvc_version
+
+    print("FATAL ERROR: Unable to detect visual studio version of your Panda3D Build!", file=sys.stderr)
+    print("Unkown compiler string was: '" + compiler + "'", file=sys.stderr)
+    print("", file=sys.stderr)
+    print("Known visual studio versions are:", file=sys.stderr)
+    for msvc_version in MSVC_VERSIONS:
+        print("-", msvc_version.cmake_str, "(" + msvc_version.compiler_search_string + ")", file=sys.stderr)
+    print("", file=sys.stderr)
+    fatal_error("Unable to determine compiler")
+
+def have_eigen():
+    """ Returns whether this panda3d build has eigen support """
+    return PandaSystem.get_global_ptr().has_system("eigen")
+
+def have_bullet():
+    """ Returns whether this panda3d build has bullet support """
+    try:
+        import panda3d.bullet
+    except Exception as msg:
+        return False
+
+    return PandaSystem.get_global_ptr().has_system("Bullet")
+
+def have_freetype():
+    """ Returns whether this panda3d build has freetype support """
+    return PandaSystem.get_global_ptr().has_system("Freetype")
+
 
 if __name__ == "__main__":
 
