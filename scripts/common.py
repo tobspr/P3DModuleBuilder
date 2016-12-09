@@ -180,6 +180,12 @@ def debug_out(*args):
     """ Prints a debug output string """
     print(*[decode_str(i) for i in args])
 
+
+def print_error(*args):
+    """ Prints a debug output string """
+    print(*[decode_str(i) for i in args], file=sys.stderr)
+
+
 def try_makedir(dirname):
     """ Tries to make the specified dir, but in case it fails it does nothing """
     debug_out("Creating directory", dirname)
@@ -189,7 +195,7 @@ def try_makedir(dirname):
         pass
 
 
-def try_execute(*args, **kwargs):
+def try_execute(*args, error_formatter=None):
     """ Tries to execute the given process, if everything wents good, it just
     returns, otherwise it prints the output to stderr and exits with a nonzero
     status code """
@@ -197,16 +203,24 @@ def try_execute(*args, **kwargs):
     try:
         process = subprocess.Popen(args, shell=False, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
         line = process.stdout.readline()
+        output = line
         while line:
             debug_out(line.decode(locale.getpreferredencoding(), errors="ignore").rstrip("\r\n"))
             line = process.stdout.readline()
+            output += line
         process.wait()
         if process.returncode != 0:
+            if error_formatter:
+                error_formatter(decode_str(output))
             raise Exception("Process had non-zero returncode:", process.returncode)
 
     except subprocess.CalledProcessError as msg:
         debug_out("Process error:")
-        debug_out(msg.output.decode(locale.getpreferredencoding(), errors="ignore"))
+        output = msg.output.decode(locale.getpreferredencoding(), errors="ignore")
+        if error_formatter:
+            error_formatter(decode_str(output))
+        else:
+            debug_out(output)
         fatal_error("Subprocess returned no-zero statuscode!")
 
 

@@ -2,14 +2,14 @@
 import shutil
 import sys
 import multiprocessing
-from os import chdir
+from os import chdir, _exit
 from os.path import isdir, isfile
 from panda3d.core import PandaSystem
 
 from .common import get_output_dir, try_makedir, fatal_error, is_windows
 from .common import is_linux, join_abs, get_panda_lib_path, is_64_bit
 from .common import try_execute, get_script_dir, get_panda_mscv_version
-from .common import have_eigen, have_bullet, have_freetype
+from .common import have_eigen, have_bullet, have_freetype, print_error
 
 
 def make_output_dir(clean=False):
@@ -26,6 +26,31 @@ def make_output_dir(clean=False):
     if not isdir(output_dir):
         fatal_error("Could not create output directory at:", output_dir)
     chdir(output_dir)
+
+
+def handle_cmake_error(output):
+    """ Improves the cmake output messages """
+    print_error("\n\n\n")
+    print_error("-" * 60)
+    print_error("\nCMake Error:")
+
+    if "Re-run cmake with a different source directory." in output:
+        print_error("You moved the project folder, please add ' --clean' to the command line.")
+
+    elif "No CMAKE_CXX_COMPILER could be found." in output or "No CMAKE_C_COMPILER could be found." in output:
+        print_error("Could not find the required compiler!")
+        if is_windows():
+            print_error("\nPlease make sure you installed the following compiler:")
+            bitness = "64 bit" if is_64_bit() else ""
+            print_error(get_panda_mscv_version().cmake_str, bitness)
+        else:
+            print_error("The required compiler is:", PandaSystem.get_compiler())
+
+
+    print_error("\n")
+    print_error("-" * 60)
+    print_error("\n\n\n")
+    exit(-1)
 
 
 def run_cmake(config, args):
@@ -107,7 +132,7 @@ def run_cmake(config, args):
 
     cmake_args += ["-DOPTIMIZE=" + str(optimize)]
 
-    try_execute("cmake", join_abs(get_script_dir(), ".."), *cmake_args)
+    output = try_execute("cmake", join_abs(get_script_dir(), ".."), *cmake_args, error_formatter=handle_cmake_error)
 
 
 def run_cmake_build(config, args):
