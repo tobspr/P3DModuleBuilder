@@ -195,10 +195,11 @@ def try_makedir(dirname):
         pass
 
 
-def try_execute(*args, error_formatter=None):
+def try_execute(*args, **kwargs):
     """ Tries to execute the given process, if everything wents good, it just
     returns, otherwise it prints the output to stderr and exits with a nonzero
     status code """
+    error_formatter = kwargs.get("error_formatter", None) # Fix for Py < 3
     debug_out("Executing command: ", ' '.join(args), "\n")
     try:
         process = subprocess.Popen(args, shell=False, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
