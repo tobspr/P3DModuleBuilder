@@ -114,7 +114,11 @@ if (WIN32)
     include_directories("${THIRDPARTY_DIR}/bullet/include/")
     link_directories("${THIRDPARTY_DIR}/bullet/lib/")
 
-    set(LIBRARIES "${LIBRARIES};LinearMath;BulletCollision;BulletDynamics;BulletSoftBody")
+    if(EXISTS "${THIRDPARTY_DIR}/bullet/lib/LinearMath_x64.lib")
+      set(LIBRARIES "${LIBRARIES};LinearMath_x64;BulletCollision_x64;BulletDynamics_x64;BulletSoftBody_x64")
+    else()
+      set(LIBRARIES "${LIBRARIES};LinearMath;BulletCollision;BulletDynamics;BulletSoftBody")
+    endif()
   endif()
 
   # [LIB] Eigen 3
