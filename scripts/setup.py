@@ -98,20 +98,22 @@ def run_cmake(config, args):
             return True
         return False
 
-    if is_required("eigen") and not have_eigen():
-        fatal_error("Your Panda3D build was not compiled with eigen support, but it is required!")
-        
-    if is_required("bullet") and not have_bullet():
-        fatal_error("Your Panda3D build was not compiled with bullet support, but it is required!")
-
-    if is_required("freetype") and not have_freetype():
-        fatal_error("Your Panda3D build was not compiled with freetype support, but it is required!")
-
-    if have_eigen():
-        cmake_args += ["-DHAVE_LIB_EIGEN=TRUE"]
-    if have_bullet():
+    """
+    if is_required("eigen"):
+        if not have_eigen():
+            fatal_error("Your Panda3D build was not compiled with eigen support, but it is required!")
+    """
+    # Eigen is always included in 1.9.1 and up
+    cmake_args += ["-DHAVE_LIB_EIGEN=TRUE"]
+    
+    if is_required("bullet"):
+        if not have_bullet():
+            fatal_error("Your Panda3D build was not compiled with bullet support, but it is required!")
         cmake_args += ["-DHAVE_LIB_BULLET=TRUE"]
-    if have_freetype():
+    
+    if is_required("freetype"):
+        if not have_freetype():
+             fatal_error("Your Panda3D build was not compiled with freetype support, but it is required!")
         cmake_args += ["-DHAVE_LIB_FREETYPE=TRUE"]
 
     # Optimization level
