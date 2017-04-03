@@ -342,9 +342,6 @@ else()
   # No exceptions
   add_definitions("-fno-exceptions")
 
-  # No RTTI
-  # add_definitions("-fno-rtti")
-
   # Differnt optimization settings
   if (OPTIMIZE STREQUAL "1")
     add_definitions("-ggdb -D_DEBUG")
@@ -354,7 +351,7 @@ else()
     add_definitions("-O2")
     add_definitions("-fno-finite-math-only -ffast-math")
   elseif(OPTIMIZE STREQUAL "4")
-    add_definitions("-O3 -DNDEBUG -ffast-math")
+    add_definitions("-O3 -DNDEBUG -ffast-math -fno-rtti")
   else()
     message(FATAL_ERROR "Invalid optimize value! Was: '${OPTIMIZE}'")
   endif()
