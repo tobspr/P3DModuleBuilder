@@ -266,6 +266,9 @@ def get_panda_mscv_version():
     print("", file=sys.stderr)
     fatal_error("Unable to determine compiler")
 
+def get_panda_short_version():
+    return PandaSystem.getVersionString().replace(".0", "")
+
 def have_eigen():
     """ Returns whether this panda3d build has eigen support """
     return PandaSystem.get_global_ptr().has_system("eigen")
@@ -297,6 +300,14 @@ if __name__ == "__main__":
 
     elif "--print-core-path" in argv:
         stdout.write(get_panda_core_lib_path())
+        exit(0)
+
+    elif "--print-lib-path" in argv:
+        stdout.write(get_panda_lib_path())
+        exit(0)
+
+    elif "--print-short-version" in argv:
+        stdout.write(get_panda_short_version())
         exit(0)
 
     elif "--print-paths" in argv:
