@@ -326,7 +326,8 @@ if (MSVC)
 
 
 else()
-
+  # Silence CMake warning on macOS
+  set(CMAKE_MACOSX_RPATH TRUE)
   # Assuming GCC here
 
   add_definitions("-ftemplate-depth-70 -fPIC -c")
@@ -388,7 +389,14 @@ endif()
 
 
 # Build library
-add_library(${PROJECT_NAME} MODULE ${SOURCES})
+if (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+  # macOS won't let us link a .so with another .so, so make a .dylib
+  add_library(${PROJECT_NAME} SHARED ${SOURCES})
+  # Python doesn't detect .dylibs, so rename it .so
+  set(CMAKE_SHARED_LIBRARY_SUFFIX ".so")
+else()
+  add_library(${PROJECT_NAME} MODULE ${SOURCES})
+endif()
 
 # Don't add lib prefix on Linux
 set_target_properties(${PROJECT_NAME} PROPERTIES PREFIX "")
@@ -408,3 +416,24 @@ add_custom_command(
     POST_BUILD
     COMMAND "${PYTHON_EXECUTABLE}" "-B" "${CMAKE_CURRENT_LIST_DIR}/scripts/finalize.py" "${PROJECT_NAME}"
     WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR})
+
+# Make shared library paths absolute on macOS
+if (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+  execute_process(
+    COMMAND "${PYTHON_EXECUTABLE}" "-B" "scripts/common.py" "--print-lib-path"
+    OUTPUT_VARIABLE PANDA_LIB_PATH
+    WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR})
+  execute_process(
+    COMMAND "${PYTHON_EXECUTABLE}" "-B" "scripts/common.py" "--print-short-version"
+    OUTPUT_VARIABLE PANDA_SHORT_VERSION
+    WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}
+  )
+
+  foreach(lib ${REQ_LIBRARIES})
+    add_custom_command(
+      TARGET ${PROJECT_NAME}
+      POST_BUILD
+      COMMAND "install_name_tool" "-change" "@loader_path/../lib/lib${lib}.${PANDA_SHORT_VERSION}.dylib" "${PANDA_LIB_PATH}/lib${lib}.dylib" "${PROJECT_NAME}${CMAKE_SHARED_LIBRARY_SUFFIX}"
+      WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR})
+  endforeach()
+endif()

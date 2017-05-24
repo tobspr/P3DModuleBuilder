@@ -10,6 +10,7 @@ from .common import get_output_dir, try_makedir, fatal_error, is_windows
 from .common import is_linux, join_abs, get_panda_lib_path, is_64_bit
 from .common import try_execute, get_script_dir, get_panda_mscv_version
 from .common import have_eigen, have_bullet, have_freetype, print_error
+from .common import is_macos
 
 
 def make_output_dir(clean=False):
@@ -81,6 +82,9 @@ def run_cmake(config, args):
         # Specify 64-bit compiler when using a 64 bit panda sdk build
         bit_suffix = " Win64" if is_64_bit() else ""
         cmake_args += ["-G" + get_panda_mscv_version().cmake_str + bit_suffix]
+    elif is_macos():
+        # Panda is 64-bit only on macOS.
+        cmake_args += ["-DCMAKE_CL_64:STRING=1"]
 
     # Specify python version, once as integer, once seperated by a dot
     pyver = "{}{}".format(sys.version_info.major, sys.version_info.minor)
@@ -148,7 +152,7 @@ def run_cmake_build(config, args):
     num_cores = max(1, multiprocessing.cpu_count() - 1)
 
     core_option = ""
-    if is_linux():
+    if is_linux() or is_macos():
         # On linux, use all available cores
         core_option = "-j" + str(num_cores)
     if is_windows():
