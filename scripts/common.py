@@ -98,6 +98,8 @@ def get_panda_bin_path():
             "/usr/local/bin",
         ]
         return first_existing_path(search, "interrogate")
+    elif is_macos():
+        return first_existing_path([join(get_panda_sdk_path(), "bin")], "interrogate")
     raise NotImplementedError("Unsupported OS")
 
 
@@ -105,14 +107,14 @@ def get_panda_lib_path():
     """ Returns the path to the panda3d libraries """
     if is_windows():
         return first_existing_path([join(get_panda_sdk_path(), "lib")], "libpanda.lib")
-    elif is_linux():
+    elif is_linux() or is_macos():
         return dirname(ExecutionEnvironment.get_dtool_name())
     raise NotImplementedError("Unsupported OS")
 
 
 def get_panda_include_path():
     """ Returns the path to the panda3d includes """
-    if is_windows():
+    if is_windows() or is_macos():
         return first_existing_path([join(get_panda_sdk_path(), "include")], "dtoolbase.h")
     elif is_linux():
         libpath = get_panda_lib_path()
@@ -151,6 +153,10 @@ def is_windows():
 def is_linux():
     """ Returns wheter the build system is linux """
     return platform.system().lower() == "linux"
+
+def is_macos():
+    """ Returns whether the build system is macos (darwin) """
+    return platform.system().lower() == "darwin"
 
 
 def get_compiler_name():
@@ -260,6 +266,9 @@ def get_panda_mscv_version():
     print("", file=sys.stderr)
     fatal_error("Unable to determine compiler")
 
+def get_panda_short_version():
+    return PandaSystem.getVersionString().replace(".0", "")
+
 def have_eigen():
     """ Returns whether this panda3d build has eigen support """
     return PandaSystem.get_global_ptr().has_system("eigen")
@@ -291,6 +300,14 @@ if __name__ == "__main__":
 
     elif "--print-core-path" in argv:
         stdout.write(get_panda_core_lib_path())
+        exit(0)
+
+    elif "--print-lib-path" in argv:
+        stdout.write(get_panda_lib_path())
+        exit(0)
+
+    elif "--print-short-version" in argv:
+        stdout.write(get_panda_short_version())
         exit(0)
 
     elif "--print-paths" in argv:

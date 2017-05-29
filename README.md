@@ -11,7 +11,7 @@ It makes compiling your C++ code the matter of a single mouse-click.
 ## Features
 
  - Automatic Python bindings using `interrogate`
- - Works on Windows, Linux and Mac *(untested, since I have no mac)*
+ - Works on Windows, Linux and Mac
 
 ## Getting started
 

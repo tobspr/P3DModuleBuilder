@@ -6,4 +6,5 @@
 # Various output names
 win_*/
 linux_*/
+osx_*/
 Source/Interrogate*
