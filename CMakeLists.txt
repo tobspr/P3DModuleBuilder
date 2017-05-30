@@ -176,7 +176,11 @@ else()
 
   # [LIB] Eigen 3
   if (HAVE_LIB_EIGEN)
-    include_directories(BEFORE "/usr/include/eigen3/")
+    if (${CMAKE_SYSTEM_NAME} MATCHES "FreeBSD")
+      include_directories(BEFORE "/usr/local/include/eigen3/")
+    else()
+      include_directories(BEFORE "/usr/include/eigen3/")
+    endif()
 
     # Eigen build flags (sync with Panda)
     if (HAVE_LIB_EIGEN)
