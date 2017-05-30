@@ -33,20 +33,19 @@ set(CMAKE_CXX_FLAGS_RELEASE "")
 set(CMAKE_CXX_FLAGS_MINSIZEREL "")
 
 
-if (CMAKE_CL_64 STREQUAL "1")
-  message(STATUS "Bitness: 64 bit ('${CMAKE_CL_64}')")
-  set(IS_64_BIT TRUE)
-  set(IS_32_BIT FALSE)
-else()
-  message(STATUS "Bitness: 32 bit ('${CMAKE_CL_64}')")
-  set(IS_64_BIT TRUE)
-  set(IS_32_BIT FALSE)
-endif()
-
 set(LIBRARIES "")
 
 # Windows - 32 and 64 bit
 if (WIN32)
+  if (CMAKE_CL_64 STREQUAL "1")
+    message(STATUS "Bitness: 64 bit ('${CMAKE_CL_64}')")
+    set(IS_64_BIT TRUE)
+    set(IS_32_BIT FALSE)
+  else()
+    message(STATUS "Bitness: 32 bit ('${CMAKE_CL_64}')")
+    set(IS_64_BIT TRUE)
+    set(IS_32_BIT FALSE)
+  endif()
 
   set(PYTHONVER CACHE STRING "27")
 
