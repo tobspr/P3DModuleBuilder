@@ -6,7 +6,7 @@ import sys
 
 from shutil import copyfile
 from os.path import isfile, join
-from common import is_windows, is_linux, is_macos, get_output_dir, fatal_error, get_script_dir
+from common import is_windows, get_output_dir, fatal_error, get_script_dir
 
 
 def find_binary():
@@ -25,7 +25,7 @@ def find_binary():
         for config in configurations:
             possible_files.append(join(get_output_dir(), config, MODULE_NAME + ".dll"))
 
-    elif is_linux() or is_macos():
+    else:
         target_file = MODULE_NAME + ".so"
         possible_files.append(join(get_output_dir(), target_file))
 

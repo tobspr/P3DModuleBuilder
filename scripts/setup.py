@@ -10,7 +10,7 @@ from .common import get_output_dir, try_makedir, fatal_error, is_windows
 from .common import is_linux, join_abs, get_panda_lib_path, is_64_bit
 from .common import try_execute, get_script_dir, get_panda_mscv_version
 from .common import have_eigen, have_bullet, have_freetype, print_error
-from .common import is_macos
+from .common import is_macos, is_freebsd
 
 
 def make_output_dir(clean=False):
@@ -93,7 +93,7 @@ def run_cmake(config, args):
     if is_windows():
         cmake_args += ["-DPYTHONVER:STRING=" + pyver]
 
-    if is_linux():
+    if is_linux() or is_freebsd():
         cmake_args += ["-DPYTHONVERDOT:STRING=" + pyver_dot]
 
     # Libraries
@@ -152,7 +152,7 @@ def run_cmake_build(config, args):
     num_cores = max(1, multiprocessing.cpu_count() - 1)
 
     core_option = ""
-    if is_linux() or is_macos():
+    if is_linux() or is_macos() or is_freebsd():
         # On linux, use all available cores
         core_option = "-j" + str(num_cores)
     if is_windows():

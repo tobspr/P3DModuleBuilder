@@ -90,7 +90,7 @@ def get_panda_bin_path():
     """ Returns the path to the panda3d binaries """
     if is_windows():
         return first_existing_path([join(get_panda_sdk_path(), "bin")], "interrogate.exe")
-    elif is_linux():
+    elif is_linux() or is_freebsd():
         libpath = get_panda_lib_path()
         search = [
             join(libpath, "../bin"),
@@ -107,7 +107,7 @@ def get_panda_lib_path():
     """ Returns the path to the panda3d libraries """
     if is_windows():
         return first_existing_path([join(get_panda_sdk_path(), "lib")], "libpanda.lib")
-    elif is_linux() or is_macos():
+    elif is_linux() or is_macos() or is_freebsd():
         return dirname(ExecutionEnvironment.get_dtool_name())
     raise NotImplementedError("Unsupported OS")
 
@@ -116,7 +116,7 @@ def get_panda_include_path():
     """ Returns the path to the panda3d includes """
     if is_windows() or is_macos():
         return first_existing_path([join(get_panda_sdk_path(), "include")], "dtoolbase.h")
-    elif is_linux():
+    elif is_linux() or is_freebsd():
         libpath = get_panda_lib_path()
         search = [
             join(libpath, "../include/"),
@@ -157,6 +157,10 @@ def is_linux():
 def is_macos():
     """ Returns whether the build system is macos (darwin) """
     return platform.system().lower() == "darwin"
+
+def is_freebsd():
+    """ Returns whether the build system is freebsd """
+    return platform.system().lower() == "freebsd"
 
 
 def get_compiler_name():
