@@ -6,7 +6,7 @@ Runs the interrogate and interrogate_module commands from Panda3D.
 """
 
 import sys
-from os import listdir, chdir
+from os import listdir, chdir, getenv
 from os.path import join, isfile, isdir
 
 from panda3d.core import PandaSystem
@@ -19,7 +19,7 @@ if len(sys.argv) != 3:
 
 
 # Parameters
-MODULE_NAME = "panda3d."+sys.argv[1]
+MODULE_NAME = getenv( "MODULE_FQN", sys.argv[1] )
 LIB_NAME = sys.argv[1]
 VERBOSE_LVL = int(sys.argv[2])  # Assume the user did specify something valid
 
