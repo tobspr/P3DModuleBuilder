@@ -212,12 +212,12 @@ def fatal_error(*args):
 
 def debug_out(*args):
     """ Prints a debug output string """
-    logger.debug(''.join(*[decode_str(i) for i in args]))
+    logger.debug(''.join([decode_str(i) for i in args]))
 
 
 def print_error(*args):
     """ Prints a debug output string """
-    logger.error(' '.join(*[decode_str(i) for i in args]))
+    logger.error(' '.join([decode_str(i) for i in args]))
 
 
 def try_makedir(dirname):
