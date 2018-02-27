@@ -88,12 +88,18 @@ def get_panda_sdk_path():
 def get_panda_core_lib_path():
     """ Returns of the path of the core panda3d module, either core.pyd on windows
     or core.so on linux. This is an absolute path """
+    # NOTE: this may be completely different than the local build
+    # but even if it is the local build core and the import core
+    # **should** be identical.  If they aren't then the developer
+    # should get a warning so s/he knows about it.
     import panda3d.core
     return panda3d.core.__file__
 
 
 def get_panda_bin_path():
     """ Returns the path to the panda3d binaries """
+    if build_path_envvar in environ:
+        return join(environ[build_path_envvar], 'bin')
     if is_windows():
         return first_existing_path([join(get_panda_sdk_path(), "bin")], "interrogate.exe")
     elif is_linux() or is_freebsd():
@@ -111,6 +117,8 @@ def get_panda_bin_path():
 
 def get_panda_lib_path():
     """ Returns the path to the panda3d libraries """
+    if build_path_envvar in environ:
+        return join(environ[build_path_envvar], 'lib')
     if is_windows():
         return first_existing_path([join(get_panda_sdk_path(), "lib")], "libpanda.lib")
     elif is_linux() or is_macos() or is_freebsd():
@@ -120,6 +128,8 @@ def get_panda_lib_path():
 
 def get_panda_include_path():
     """ Returns the path to the panda3d includes """
+    if build_path_envvar in environ:
+        return join(environ[build_path_envvar], 'include')
     if is_windows() or is_macos():
         return first_existing_path([join(get_panda_sdk_path(), "include")], "dtoolbase.h")
     elif is_linux() or is_freebsd():
