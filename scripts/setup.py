@@ -2,7 +2,7 @@
 import shutil
 import sys
 import multiprocessing
-from os import chdir, _exit
+from os import chdir, _exit, environ
 from os.path import isdir, isfile
 from panda3d.core import PandaSystem
 
@@ -10,7 +10,7 @@ from .common import get_output_dir, try_makedir, fatal_error, is_windows
 from .common import is_linux, join_abs, get_panda_lib_path, is_64_bit
 from .common import try_execute, get_script_dir, get_panda_mscv_version
 from .common import have_eigen, have_bullet, have_freetype, print_error
-from .common import is_macos, is_freebsd
+from .common import is_macos, is_freebsd, build_path_envvar
 
 
 def make_output_dir(clean=False):
@@ -86,6 +86,10 @@ def run_cmake(config, args):
         # Panda is 64-bit only on macOS.
         cmake_args += ["-DCMAKE_CL_64:STRING=1"]
 
+    if build_path_envvar in environ:
+        cmake_args.append("-D{}:STRING={}".format(build_path_envvar,
+                environ[build_path_envvar])
+
     # Specify python version, once as integer, once seperated by a dot
     pyver = "{}{}".format(sys.version_info.major, sys.version_info.minor)
     pyver_dot = "{}.{}".format(sys.version_info.major, sys.version_info.minor)
@@ -109,12 +113,12 @@ def run_cmake(config, args):
     """
     # Eigen is always included in 1.9.1 and up
     cmake_args += ["-DHAVE_LIB_EIGEN=TRUE"]
-    
+
     if is_required("bullet"):
         if not have_bullet():
             fatal_error("Your Panda3D build was not compiled with bullet support, but it is required!")
         cmake_args += ["-DHAVE_LIB_BULLET=TRUE"]
-    
+
     if is_required("freetype"):
         if not have_freetype():
              fatal_error("Your Panda3D build was not compiled with freetype support, but it is required!")
