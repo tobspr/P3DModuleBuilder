@@ -7,6 +7,8 @@ import sys
 import os
 import argparse
 from os.path import join, realpath, dirname
+import logging
+logger = logging.getLogger(__name__)
 
 # Change into the current directory
 os.chdir(dirname(realpath(__file__)))
@@ -15,7 +17,7 @@ from scripts.common import get_ini_conf, write_ini_conf  # noqa
 from scripts.setup import make_output_dir, run_cmake, run_cmake_build
 
 if __name__ == "__main__":
-
+    loglevel = logging.WARN
     # Arguments
     parser = argparse.ArgumentParser(description="P3DModuleBuilder")
     parser.add_argument(
@@ -23,7 +25,15 @@ if __name__ == "__main__":
         help="Optimize level, should match the one used for the Panda3D build",)
     parser.add_argument(
         "--clean", action="store_true", help="Forces a clean rebuild")
+    parser.add_argument('--debug', action='store_true')
+    parser.add_argument('--verbose', action='store_true')
     args = parser.parse_args()
+    if args.debug:
+        loglevel = logging.DEBUG
+    elif args.verbose:
+        loglevel = logging.INFO
+    # set loging default basic configuration and loglevel
+    logging.basicConfig(level=loglevel)
 
     # Python 2 compatibility
     if sys.version_info.major > 2:
@@ -40,7 +50,7 @@ if __name__ == "__main__":
     # Check for outdated parameters
     for outdated_param in ["vc_version", "use_lib_eigen", "use_lib_bullet", "use_lib_freetype"]:
         if outdated_param in config:
-            print("WARNING: Removing obsolete parameter '" + outdated_param + "', is now auto-detected.")
+            logger.warn("Removing obsolete parameter '" + outdated_param + "', is now auto-detected.")
             del config[outdated_param]
 
     # Write back config
