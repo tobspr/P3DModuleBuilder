@@ -21,6 +21,15 @@ from panda3d.core import PandaSystem, Filename, ExecutionEnvironment
 
 build_path_envvar = 'LOCAL_PANDA_BUILD'
 
+class FatalError(Exception):
+    """FatalError
+        Exception to raise fatal errors instead of calling exit
+    """
+    msgs = None
+    def __init__(self, *msgs):
+        super().__init__(msgs[0])
+        self.msgs = msgs
+
 class MSVCVersion(object):
     def __init__(self, msc_ver, cmake_str, suffix):
         self.version = msc_ver
@@ -197,19 +206,18 @@ def decode_str(s):
 
 def fatal_error(*args):
     """ Prints an error to stderr and then exits with a nonzero status code """
-
-    print("\n\n[!] FATAL ERROR:", *[decode_str(i) for i in args], file=stderr)
-    exit(1)
+    logger.error(' '.join('FATAL: ', *[decode_str(i) for i in args]))
+    raise FatalError(args)
 
 
 def debug_out(*args):
     """ Prints a debug output string """
-    print(*[decode_str(i) for i in args])
+    logger.debug(''.join(*[decode_str(i) for i in args]))
 
 
 def print_error(*args):
     """ Prints a debug output string """
-    print(*[decode_str(i) for i in args], file=sys.stderr)
+    logger.error(' '.join(*[decode_str(i) for i in args]))
 
 
 def try_makedir(dirname):
@@ -277,13 +285,12 @@ def get_panda_mscv_version():
         if msvc_version.compiler_search_string in compiler:
             return msvc_version
 
-    print("FATAL ERROR: Unable to detect visual studio version of your Panda3D Build!", file=sys.stderr)
-    print("Unkown compiler string was: '" + compiler + "'", file=sys.stderr)
-    print("", file=sys.stderr)
-    print("Known visual studio versions are:", file=sys.stderr)
+    logger.error("FATAL ERROR: Unable to detect visual studio version of your Panda3D Build!")
+    logger.error("Unkown compiler string was: '" + compiler + "'")
+    logger.error("Known visual studio versions are:")
     for msvc_version in MSVC_VERSIONS:
-        print("-", msvc_version.cmake_str, "(" + msvc_version.compiler_search_string + ")", file=sys.stderr)
-    print("", file=sys.stderr)
+        logger.error("-", msvc_version.cmake_str, "(" + msvc_version.compiler_search_string + ")")
+    logger.error("")
     fatal_error("Unable to determine compiler")
 
 def get_panda_short_version():
