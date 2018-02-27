@@ -88,7 +88,7 @@ def run_cmake(config, args):
 
     if build_path_envvar in environ:
         cmake_args.append("-D{}:STRING={}".format(build_path_envvar,
-                environ[build_path_envvar])
+                environ[build_path_envvar]))
 
     # Specify python version, once as integer, once seperated by a dot
     pyver = "{}{}".format(sys.version_info.major, sys.version_info.minor)
