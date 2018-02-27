@@ -8,6 +8,8 @@ Runs the interrogate and interrogate_module commands from Panda3D.
 import sys
 from os import listdir, chdir
 from os.path import join, isfile, isdir
+import logging
+logger = logging.getLogger(__name__)
 
 from panda3d.core import PandaSystem
 from common import debug_out, get_panda_bin_path, get_panda_include_path
@@ -19,8 +21,9 @@ if len(sys.argv) != 3:
 
 
 # Parameters
-MODULE_NAME = sys.argv[1]
-VERBOSE_LVL = int(sys.argv[2])  # Assume the user did specify something valid
+#set with __main__ or caller, don't default
+MODULE_NAME = None
+VERBOSE_LVL = None
 
 
 def check_ignore(source):
@@ -128,8 +131,22 @@ def interrogate_module():
 
 if __name__ == "__main__":
 
+    # Parameters
+    # TODO: add reall param processing
+    loglevel = logging.INFO
+    param_offset = 0
+    if sys.argv[1] == '-d' or sys.argv[1] == '--debug':
+        loglevel = logging.DEBUG
+        param_offset+=1
+    logging.basicConfig(level=loglevel)
+
+    MODULE_NAME = sys.argv[1+param_offset]
+    VERBOSE_LVL = int(sys.argv[2+param_offset])
+
     # Change into the source directory
-    source_dir = join(get_script_dir(), "../source/")
+    import pudb
+    pu.db
+    source_dir = join(get_script_dir(), '..', 'source')
     chdir(source_dir)
 
     interrogate()

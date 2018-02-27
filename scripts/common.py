@@ -6,16 +6,20 @@ Common functions for the build system
 
 from __future__ import print_function
 
+import logging
+logger = logging.getLogger(__name__)
+
 import locale
 import sys
 import subprocess
 import platform
 
 from os.path import dirname, realpath, join, isdir, isfile
-from os import makedirs
+from os import makedirs, environ
 from sys import argv, stdout, stderr, exit
 from panda3d.core import PandaSystem, Filename, ExecutionEnvironment
 
+build_path_envvar = 'LOCAL_PANDA_BUILD'
 
 class MSVCVersion(object):
     def __init__(self, msc_ver, cmake_str, suffix):
@@ -66,6 +70,8 @@ def get_output_dir():
 
 def get_panda_sdk_path():
     """ Returns the path of the panda3d sdk, under windows """
+    if build_path_envvar in environ:
+        return environ[build_path_envvar]
     # Import the base panda3d module
     import panda3d
 
