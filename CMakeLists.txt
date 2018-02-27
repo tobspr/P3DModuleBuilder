@@ -163,6 +163,11 @@ if (WIN32)
   link_directories("${PANDA_LIBRARY_DIRS}")
 
 else()
+  if(EXISTS "${LOCAL_PANDA_BUILD}")
+      set(PANDA_LIBRARY_DIRS "${LOCAL_PANDA_BUILD}/lib")
+      set(PANDA_INCLUDE_DIR "${LOCAL_PANDA_BUILD}/include")
+  endif()
+
   set(PYTHONVERDOT CACHE STRING "2.7")
   set(Python_ADDITIONAL_VERSIONS ${PYTHONVERDOT})
   find_package(PythonLibs REQUIRED)
@@ -202,7 +207,7 @@ else()
   find_path(PANDA_INCLUDE_DIR dtoolbase.h PATH_SUFFIXES panda3d)
 
   # Locate the Panda3D libraries
-  set(REQ_LIBRARIES p3framework panda pandaexpress p3dtool p3dtoolconfig p3direct ${INTERROGATE_LIB})
+  set(REQ_LIBRARIES p3framework panda pandaexpress p3dtool p3dtoolconfig p3direct "${INTERROGATE_LIB}")
   if(HAVE_LIB_BULLET)
     set(REQ_LIBRARIES pandabullet ${REQ_LIBRARIES})
   endif()
@@ -218,7 +223,6 @@ else()
 
   if (NOT EXISTS ${PANDA_INCLUDE_DIR})
     # Okay, the standard package handling failed. Try finding a local panda3d installation
-
     # Find panda path
     execute_process(
       COMMAND "${PYTHON_EXECUTABLE}" "-B" "scripts/common.py" "--print-sdk-path"
