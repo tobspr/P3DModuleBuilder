@@ -144,8 +144,6 @@ if __name__ == "__main__":
     VERBOSE_LVL = int(sys.argv[2+param_offset])
 
     # Change into the source directory
-    import pudb
-    pu.db
     source_dir = join(get_script_dir(), '..', 'source')
     chdir(source_dir)
 
