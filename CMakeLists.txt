@@ -86,7 +86,7 @@ if (WIN32)
   endif()
 
   if (NOT (EXISTS "${THIRDPARTY_DIR}"))
-    message(WARNING "Unable to find thirdparty directory! Expected it at: ${THIRDPARTY_DIR}")
+    message(FATAL_ERROR "Unable to find thirdparty directory! Expected it at: ${THIRDPARTY_DIR}. You can get it from https://www.panda3d.org/forums/viewtopic.php?f=9&t=18775 by downloading a prebuilt version or by compiling it yourself.")
   else()
     message(STATUS "Detected thirdparty directory: ${THIRDPARTY_DIR}")
   endif()
