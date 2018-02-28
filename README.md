@@ -84,6 +84,7 @@ print(example.get_answer()) # prints 42
 
 - The Panda3D SDK (get it <a href="http://www.panda3d.org/download.php?sdk">here</a>)
 - CMake 2.6 or higher (get it <a href="https://cmake.org/download/">here</a>)
+- windows only: The thirdparty folder installed in the Panda3D sdk folder (See <a href="https://www.panda3d.org/forums/viewtopic.php?f=9&t=18775">here</a>)
 
 
 **For compiling on Windows 32 bit:**

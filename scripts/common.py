@@ -40,7 +40,7 @@ def get_output_name():
     """ Returns the name of the output dir, depending on the system architecture """
     compiler_suffix = ""
     if is_windows():
-        compiler_suffix = "_" + get_panda_mscv_version().suffix
+        compiler_suffix = "_" + get_panda_msvc_version().suffix
 
     version_suffix = "panda" + PandaSystem.get_version_string()
 
@@ -106,10 +106,14 @@ def get_panda_core_lib_path():
     return panda3d.core.__file__
 
 
+def find_in_sdk(folder, filename, on_error=""):
+    """ Finds the required folder in the sdk, requiring that it contains the given filename """
+    return first_existing_path([folder], required_file=filename, base_dir=get_panda_sdk_path(), on_error=on_error)
+
 def get_panda_bin_path():
     """ Returns the path to the panda3d binaries """
     if is_windows():
-        return first_existing_path([join(get_panda_sdk_path(), "bin")], "interrogate.exe")
+        return find_in_sdk("bin", "interrogate.exe", on_error="Failed to find binary path")
     elif is_linux() or is_freebsd():
         libpath = get_panda_lib_path()
         search = [
@@ -119,14 +123,14 @@ def get_panda_bin_path():
         ]
         return first_existing_path(search, "interrogate")
     elif is_macos():
-        return first_existing_path([join(get_panda_sdk_path(), "bin")], "interrogate")
+        return find_in_sdk("bin", "interrogate", on_error="Failed to find binary path")
     raise NotImplementedError("Unsupported OS")
 
 
 def get_panda_lib_path():
     """ Returns the path to the panda3d libraries """
     if is_windows():
-        return first_existing_path([join(get_panda_sdk_path(), "lib")], "libpanda.lib")
+        return find_in_sdk("lib", "libpanda.lib")
     elif is_linux() or is_macos() or is_freebsd():
         return dirname(ExecutionEnvironment.get_dtool_name())
     raise NotImplementedError("Unsupported OS")
@@ -135,7 +139,7 @@ def get_panda_lib_path():
 def get_panda_include_path():
     """ Returns the path to the panda3d includes """
     if is_windows() or is_macos():
-        return first_existing_path([join(get_panda_sdk_path(), "include")], "dtoolbase.h")
+        return find_in_sdk("include", "dtoolbase.h")
     elif is_linux() or is_freebsd():
         libpath = get_panda_lib_path()
         search = [
@@ -147,17 +151,21 @@ def get_panda_include_path():
     raise NotImplementedError("Unsupported OS")
 
 
-def first_existing_path(paths, required_file=None):
+def first_existing_path(paths, required_file=None, base_dir=None, on_error=""):
     """ Returns the first path out of a given list of paths which exists.
     If required_file is set, the path additionally has to contain the given
     filename """
     for pth in paths:
+        if base_dir:
+            pth = join(base_dir, pth)
         if isdir(pth) and (required_file is None or isfile(join(pth, required_file))):
-            return pth
-    debug_out("No path out of the given list exists!")
+            return realpath(pth)
+    if on_error:
+        print_error("\n" + on_error + "\n")
+    print_error("We tried to find a folder or file on the following paths:")
     for pth in paths:
-        debug_out("[-]", pth)
-    fatal_error("Failed to match path")
+        print_error("[-]", realpath(join(base_dir, pth)))
+    fatal_error("Failed to locate path")
 
 
 def is_64_bit():
@@ -201,7 +209,6 @@ def decode_str(s):
 
 def fatal_error(*args):
     """ Prints an error to stderr and then exits with a nonzero status code """
-
     print("\n\n[!] FATAL ERROR:", *[decode_str(i) for i in args], file=stderr)
     exit(1)
 
@@ -274,7 +281,7 @@ def write_ini_conf(config, fname):
     with open(fname, "w") as handle:
         handle.write(''.join("{}={}\n".format(k, v) for k, v in sorted(config.items())))
 
-def get_panda_mscv_version():
+def get_panda_msvc_version():
     """ Returns the MSVC version panda was built with """
     compiler = PandaSystem.get_compiler()
     for msvc_version in MSVC_VERSIONS:
@@ -309,6 +316,31 @@ def have_bullet():
 def have_freetype():
     """ Returns whether this panda3d build has freetype support """
     return PandaSystem.get_global_ptr().has_system("Freetype")
+
+
+def get_win_thirdparty_dir():
+    """ Returns the path of the thirdparty directory, windows only """
+    msvc_suffix = get_panda_msvc_version().suffix
+
+    # The thirdparty directory is named "vc14" for example instead of "vc140"
+    if msvc_suffix.endswith("0"):
+        msvc_suffix = msvc_suffix[:-1]
+
+    bit_suffix = "-x64" if is_64_bit() else ""
+    full_suffix = "-" + msvc_suffix + bit_suffix
+
+    possible_dirs = []
+
+    for base_dir in [".", "..", "../..", "thirdparty", "thirdparty" + full_suffix]:
+        for thirdparty_suffix in ["", full_suffix]:
+            for folder_suffix in ["", full_suffix]:
+                possible_dirs.append(join(
+                    base_dir, "thirdparty" + thirdparty_suffix, "win-libs" + folder_suffix))
+
+    error_msg = ("The thirdparty directory could not be found. You can get it from "
+                 "https://www.panda3d.org/forums/viewtopic.php?f=9&t=18775 by downloading "
+                 "a prebuilt version or by compiling it yourself.")
+    return first_existing_path(possible_dirs, base_dir=get_panda_sdk_path(), on_error=error_msg)
 
 
 if __name__ == "__main__":

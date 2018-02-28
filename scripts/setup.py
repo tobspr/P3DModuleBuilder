@@ -8,9 +8,10 @@ from panda3d.core import PandaSystem
 
 from .common import get_output_dir, try_makedir, fatal_error, is_windows
 from .common import is_linux, join_abs, get_panda_lib_path, is_64_bit
-from .common import try_execute, get_script_dir, get_panda_mscv_version
+from .common import try_execute, get_script_dir, get_panda_msvc_version
 from .common import have_eigen, have_bullet, have_freetype, print_error
 from .common import is_macos, is_freebsd, is_installed_via_pip
+from .common import get_win_thirdparty_dir
 
 
 def make_output_dir(clean=False):
@@ -43,7 +44,7 @@ def handle_cmake_error(output):
         if is_windows():
             print_error("\nPlease make sure you installed the following compiler:")
             bitness = "64 bit" if is_64_bit() else ""
-            print_error(get_panda_mscv_version().cmake_str, bitness)
+            print_error(get_panda_msvc_version().cmake_str, bitness)
         else:
             print_error("The required compiler is:", PandaSystem.get_compiler())
 
@@ -86,7 +87,7 @@ def run_cmake(config, args):
     if is_windows():
         # Specify 64-bit compiler when using a 64 bit panda sdk build
         bit_suffix = " Win64" if is_64_bit() else ""
-        cmake_args += ["-G" + get_panda_mscv_version().cmake_str + bit_suffix]
+        cmake_args += ["-G" + get_panda_msvc_version().cmake_str + bit_suffix]
     elif is_macos():
         # Panda is 64-bit only on macOS.
         cmake_args += ["-DCMAKE_CL_64:STRING=1"]
@@ -100,6 +101,12 @@ def run_cmake(config, args):
 
     if is_linux() or is_freebsd():
         cmake_args += ["-DPYTHONVERDOT:STRING=" + pyver_dot]
+
+    # Thirdparty directory
+    if is_windows():
+        cmake_args += ["-DTHIRDPARTY_WIN_DIR=" + get_win_thirdparty_dir()]
+    else:
+        cmake_args += ["-DTHIRDPARTY_WIN_DIR="]
 
     # Libraries
     def is_required(lib):
