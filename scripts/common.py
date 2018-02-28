@@ -74,7 +74,27 @@ def get_basepath():
 
 def get_output_dir():
     """ Returns the output directory where CMake generates the build files into """
-    return join(get_basepath(), get_output_name())
+    return realpath(join(get_basepath(), get_output_name()))
+
+
+def get_python_dir():
+    """ Returns the directory of the python installation """
+    return dirname(sys.executable)
+
+
+def is_subdirectory(base, subdir):
+    """ Returns whether subdir is the same or subdirectory of base """
+    base_real = realpath(base)
+    sub_real = realpath(subdir)
+    return sub_real.startswith(base_real)
+
+
+def is_installed_via_pip():
+    """ Returns whether panda3d has been installed via pip and thus has a different path layout """
+    import panda3d
+    python_base = get_python_dir()
+    p3d_module = dirname(panda3d.__file__)
+    return is_subdirectory(python_base, p3d_module)
 
 
 def get_panda_sdk_path():

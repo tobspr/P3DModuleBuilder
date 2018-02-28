@@ -10,7 +10,7 @@ from .common import get_output_dir, try_makedir, fatal_error, is_windows
 from .common import is_linux, join_abs, get_panda_lib_path, is_64_bit
 from .common import try_execute, get_script_dir, get_panda_mscv_version
 from .common import have_eigen, have_bullet, have_freetype, print_error
-from .common import is_macos, is_freebsd, build_path_envvar
+from .common import is_macos, is_freebsd, build_path_envvar, is_installed_via_pip
 
 
 def make_output_dir(clean=False):
@@ -67,10 +67,15 @@ def run_cmake(config, args):
 
     lib_prefix = "lib" if is_windows() else ""
 
+    if is_installed_via_pip():
+        fatal_error("Panda3D seems to be installed as a pip package. Since "
+                    "no headers are included, we can't build against this version. Please install the "
+                    "Panda3D SDK from http://www.panda3d.org/download.php?sdk")
+
     # Check for the right interrogate lib
     if PandaSystem.get_major_version() > 1 or PandaSystem.get_minor_version() > 9:
         cmake_args += ["-DINTERROGATE_LIB:STRING=" + lib_prefix + "p3interrogatedb"]
-    else:
+    else: 
 
         # Buildbot versions do not have the core lib, instead try using libpanda
         if not isfile(join_abs(get_panda_lib_path(), "core.lib")):
