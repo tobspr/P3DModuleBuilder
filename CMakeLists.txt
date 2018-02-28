@@ -15,6 +15,7 @@ set(OPTIMIZE CACHE STRING "3")
 set(IGATE_VERBOSE CACHE STRING "0")
 set(INTERROGATE_LIB CACHE STRING "p3interrogatedb")
 set(PYTHON_EXECUTABLE CACHE STRING "python")
+set(THIRDPARTY_WIN_DIR CACHE STRING "")
 
 
 # --- User controllable variables ---
@@ -79,17 +80,8 @@ if (WIN32)
   message(STATUS "Detected visual studio version: ${MSVC_VERSION_SHORT}")
 
 
-  # Find thirdparty directory
-  set(THIRDPARTY_DIR "${WIN_PANDA_PATH}/../thirdparty/win-libs-${MSVC_VERSION_SHORT}${THIRDPARTY_SUFFIX}")
-  if (NOT (EXISTS "${THIRDPARTY_DIR}"))
-    set(THIRDPARTY_DIR "${WIN_PANDA_PATH}/thirdparty/win-libs-${MSVC_VERSION_SHORT}${THIRDPARTY_SUFFIX}")
-  endif()
-
-  if (NOT (EXISTS "${THIRDPARTY_DIR}"))
-    message(FATAL_ERROR "Unable to find thirdparty directory! Expected it at: ${THIRDPARTY_DIR}. You can get it from https://www.panda3d.org/forums/viewtopic.php?f=9&t=18775 by downloading a prebuilt version or by compiling it yourself.")
-  else()
-    message(STATUS "Detected thirdparty directory: ${THIRDPARTY_DIR}")
-  endif()
+  set(THIRDPARTY_DIR ${THIRDPARTY_WIN_DIR})
+  message(STATUS "Detected thirdparty directory: ${THIRDPARTY_DIR}")
 
 
   # Find lib and include directory
