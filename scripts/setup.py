@@ -4,6 +4,9 @@ import sys
 import multiprocessing
 from os import chdir, _exit, environ
 from os.path import isdir, isfile
+import logging
+logger = logging.getLogger(__name__)
+
 from panda3d.core import PandaSystem
 
 from .common import get_output_dir, try_makedir, fatal_error, is_windows
@@ -21,7 +24,7 @@ def make_output_dir(clean=False):
 
     # Cleanup output directory in case clean is specified
     if isdir(output_dir) and clean:
-        print("Cleaning up output directory ..")
+        logger.info("Cleaning up output directory ..")
         shutil.rmtree(output_dir)
 
     try_makedir(output_dir)
