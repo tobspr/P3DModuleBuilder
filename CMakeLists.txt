@@ -155,6 +155,12 @@ if (WIN32)
   link_directories("${PANDA_LIBRARY_DIRS}")
 
 else()
+  if(EXISTS "${LOCAL_PANDA_BUILD}")
+      set(PANDA_LIBRARY_DIRS "${LOCAL_PANDA_BUILD}/lib")
+      set(PANDA_INCLUDE_DIR "${LOCAL_PANDA_BUILD}/include")
+      set(CMAKE_LIBRARY_PATH "${CMAKE_LIBRARY_PATH};${PANDA_LIBRARY_DIRS}")
+  endif()
+
   set(PYTHONVERDOT CACHE STRING "2.7")
   set(Python_ADDITIONAL_VERSIONS ${PYTHONVERDOT})
   find_package(PythonLibs REQUIRED)
@@ -210,7 +216,6 @@ else()
 
   if (NOT EXISTS ${PANDA_INCLUDE_DIR})
     # Okay, the standard package handling failed. Try finding a local panda3d installation
-
     # Find panda path
     execute_process(
       COMMAND "${PYTHON_EXECUTABLE}" "-B" "scripts/common.py" "--print-sdk-path"

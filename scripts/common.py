@@ -6,16 +6,29 @@ Common functions for the build system
 
 from __future__ import print_function
 
+import logging
+logger = logging.getLogger(__name__)
+
 import locale
 import sys
 import subprocess
 import platform
 
 from os.path import dirname, realpath, join, isdir, isfile
-from os import makedirs
+from os import makedirs, environ
 from sys import argv, stdout, stderr, exit
 from panda3d.core import PandaSystem, Filename, ExecutionEnvironment
 
+build_path_envvar = 'LOCAL_PANDA_BUILD'
+
+class FatalError(Exception):
+    """FatalError
+        Exception to raise fatal errors instead of calling exit
+    """
+    msgs = None
+    def __init__(self, *msgs):
+        super().__init__(msgs[0])
+        self.msgs = msgs
 
 class MSVCVersion(object):
     def __init__(self, msc_ver, cmake_str, suffix):
@@ -86,6 +99,8 @@ def is_installed_via_pip():
 
 def get_panda_sdk_path():
     """ Returns the path of the panda3d sdk, under windows """
+    if build_path_envvar in environ:
+        return environ[build_path_envvar]
     # Import the base panda3d module
     import panda3d
 
@@ -102,6 +117,10 @@ def get_panda_sdk_path():
 def get_panda_core_lib_path():
     """ Returns of the path of the core panda3d module, either core.pyd on windows
     or core.so on linux. This is an absolute path """
+    # NOTE: this may be completely different than the local build
+    # but even if it is the local build core and the import core
+    # **should** be identical.  If they aren't then the developer
+    # should get a warning so s/he knows about it.
     import panda3d.core
     return panda3d.core.__file__
 
@@ -112,6 +131,8 @@ def find_in_sdk(folder, filename, on_error=""):
 
 def get_panda_bin_path():
     """ Returns the path to the panda3d binaries """
+    if build_path_envvar in environ:
+        return join(environ[build_path_envvar], 'bin')
     if is_windows():
         return find_in_sdk("bin", "interrogate.exe", on_error="Failed to find binary path")
     elif is_linux() or is_freebsd():
@@ -129,6 +150,8 @@ def get_panda_bin_path():
 
 def get_panda_lib_path():
     """ Returns the path to the panda3d libraries """
+    if build_path_envvar in environ:
+        return join(environ[build_path_envvar], 'lib')
     if is_windows():
         return find_in_sdk("lib", "libpanda.lib")
     elif is_linux() or is_macos() or is_freebsd():
@@ -138,6 +161,8 @@ def get_panda_lib_path():
 
 def get_panda_include_path():
     """ Returns the path to the panda3d includes """
+    if build_path_envvar in environ:
+        return join(environ[build_path_envvar], 'include')
     if is_windows() or is_macos():
         return find_in_sdk("include", "dtoolbase.h")
     elif is_linux() or is_freebsd():
@@ -209,18 +234,18 @@ def decode_str(s):
 
 def fatal_error(*args):
     """ Prints an error to stderr and then exits with a nonzero status code """
-    print("\n\n[!] FATAL ERROR:", *[decode_str(i) for i in args], file=stderr)
-    exit(1)
+    logger.error(' '.join('FATAL: ', *[decode_str(i) for i in args]))
+    raise FatalError(args)
 
 
 def debug_out(*args):
     """ Prints a debug output string """
-    print(*[decode_str(i) for i in args])
+    logger.debug(''.join([decode_str(i) for i in args]))
 
 
 def print_error(*args):
     """ Prints a debug output string """
-    print(*[decode_str(i) for i in args], file=sys.stderr)
+    logger.error(' '.join([decode_str(i) for i in args]))
 
 
 def try_makedir(dirname):
@@ -288,13 +313,12 @@ def get_panda_msvc_version():
         if msvc_version.compiler_search_string in compiler:
             return msvc_version
 
-    print("FATAL ERROR: Unable to detect visual studio version of your Panda3D Build!", file=sys.stderr)
-    print("Unkown compiler string was: '" + compiler + "'", file=sys.stderr)
-    print("", file=sys.stderr)
-    print("Known visual studio versions are:", file=sys.stderr)
+    logger.error("FATAL ERROR: Unable to detect visual studio version of your Panda3D Build!")
+    logger.error("Unkown compiler string was: '" + compiler + "'")
+    logger.error("Known visual studio versions are:")
     for msvc_version in MSVC_VERSIONS:
-        print("-", msvc_version.cmake_str, "(" + msvc_version.compiler_search_string + ")", file=sys.stderr)
-    print("", file=sys.stderr)
+        logger.error("-", msvc_version.cmake_str, "(" + msvc_version.compiler_search_string + ")")
+    logger.error("")
     fatal_error("Unable to determine compiler")
 
 def get_panda_short_version():
