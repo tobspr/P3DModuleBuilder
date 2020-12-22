@@ -33,7 +33,25 @@ MSVC_VERSIONS = [
     MSVCVersion(1600, "Visual Studio 10 2010", "vc100"),
     MSVCVersion(1700, "Visual Studio 11 2012", "vc110"),
     MSVCVersion(1800, "Visual Studio 12 2013", "vc120"),
-    MSVCVersion(1900, "Visual Studio 14 2015", "vc140")
+    MSVCVersion(1900, "Visual Studio 14 2015", "vc140"),
+    
+    MSVCVersion(1910, "Visual Studio 15 2017", "vc141"),
+    MSVCVersion(1911, "Visual Studio 15 2017", "vc141"),
+    MSVCVersion(1912, "Visual Studio 15 2017", "vc141"),
+    MSVCVersion(1913, "Visual Studio 15 2017", "vc141"),
+    MSVCVersion(1914, "Visual Studio 15 2017", "vc141"),
+    MSVCVersion(1915, "Visual Studio 15 2017", "vc141"),
+    MSVCVersion(1916, "Visual Studio 15 2017", "vc141"),
+    
+    MSVCVersion(1920, "Visual Studio 16 2019", "vc142"),
+    MSVCVersion(1921, "Visual Studio 16 2019", "vc142"),
+    MSVCVersion(1922, "Visual Studio 16 2019", "vc142"),
+    MSVCVersion(1923, "Visual Studio 16 2019", "vc142"),
+    MSVCVersion(1924, "Visual Studio 16 2019", "vc142"),
+    MSVCVersion(1925, "Visual Studio 16 2019", "vc142"),
+    MSVCVersion(1926, "Visual Studio 16 2019", "vc142"),
+    MSVCVersion(1927, "Visual Studio 16 2019", "vc142"),
+    MSVCVersion(1928, "Visual Studio 16 2019", "vc142")
 ]
 
 def get_output_name():
