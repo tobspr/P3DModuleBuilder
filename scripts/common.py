@@ -340,8 +340,8 @@ def get_win_thirdparty_dir():
     """ Returns the path of the thirdparty directory, windows only """
     msvc_suffix = get_panda_msvc_version().suffix
 
-    # The thirdparty directory is named "vc14" for example instead of "vc140"
-    if msvc_suffix.endswith("0"):
+    # The thirdparty directory is named "vc14" for example instead of "vc142"
+    if msvc_suffix.endswith("2"):
         msvc_suffix = msvc_suffix[:-1]
 
     bit_suffix = "-x64" if is_64_bit() else ""
