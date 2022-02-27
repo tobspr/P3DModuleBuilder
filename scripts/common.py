@@ -51,7 +51,11 @@ MSVC_VERSIONS = [
     MSVCVersion(1925, "Visual Studio 16 2019", "vc142"),
     MSVCVersion(1926, "Visual Studio 16 2019", "vc142"),
     MSVCVersion(1927, "Visual Studio 16 2019", "vc142"),
-    MSVCVersion(1928, "Visual Studio 16 2019", "vc142")
+    MSVCVersion(1928, "Visual Studio 16 2019", "vc142"),
+    MSVCVersion(1929, "Visual Studio 16 2019", "vc142"),
+
+    MSVCVersion(1930, "Visual Studio 17 2022", "vc143"),
+    MSVCVersion(1931, "Visual Studio 17 2022", "vc143")
 ]
 
 def get_output_name():
@@ -307,7 +311,7 @@ def get_panda_msvc_version():
             return msvc_version
 
     print("FATAL ERROR: Unable to detect visual studio version of your Panda3D Build!", file=sys.stderr)
-    print("Unkown compiler string was: '" + compiler + "'", file=sys.stderr)
+    print("Unknown compiler string was: '" + compiler + "'", file=sys.stderr)
     print("", file=sys.stderr)
     print("Known visual studio versions are:", file=sys.stderr)
     for msvc_version in MSVC_VERSIONS:
@@ -392,4 +396,4 @@ if __name__ == "__main__":
         debug_out("Compiler:", get_compiler_name())
 
     else:
-        fatal_error("Unkown options: ", ' '.join(argv[1:]))
+        fatal_error("Unknown options: ", ' '.join(argv[1:]))
