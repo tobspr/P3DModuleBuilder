@@ -6,7 +6,7 @@ Runs the interrogate and interrogate_module commands from Panda3D.
 """
 
 import sys
-from os import listdir, chdir
+from os import listdir, chdir, getenv
 from os.path import join, isfile, isdir
 import re
 
@@ -20,7 +20,8 @@ if len(sys.argv) != 3:
 
 
 # Parameters
-MODULE_NAME = sys.argv[1]
+MODULE_NAME = getenv( "MODULE_FQN", sys.argv[1] )
+LIB_NAME = sys.argv[1]
 VERBOSE_LVL = int(sys.argv[2])  # Assume the user did specify something valid
 
 
@@ -75,7 +76,7 @@ def interrogate():
     cmd += ["-oc", "interrogate_wrapper.cpp"]
     cmd += ["-od", "interrogate.in"]
     cmd += ["-module", MODULE_NAME]
-    cmd += ["-library", MODULE_NAME]
+    cmd += ["-library", LIB_NAME]
 
     if PandaSystem.get_major_version() > 1 or PandaSystem.get_minor_version() > 9:
         # Add nomangle option, but only for recent builds
@@ -122,7 +123,7 @@ def interrogate_module():
         cmd += ["-import", "panda3d.core"]
 
     cmd += ["-module", MODULE_NAME]
-    cmd += ["-library", MODULE_NAME]
+    cmd += ["-library", LIB_NAME]
     cmd += ["-oc", "interrogate_module.cpp"]
     cmd += ["interrogate.in"]
 
